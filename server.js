@@ -606,3 +606,25 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 }); 
+// Seed initial products if database is empty
+async function seedProducts() {
+  try {
+    const count = await Product.countDocuments();
+    if (count === 0) {
+      await Product.insertMany([
+        { title: 'Wireless Bluetooth Gaming Headphones', price: 8500, category: 'Electronics', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500', rating: 4.8 },
+        { title: 'Smart Watch Series 8 Ultra', price: 15400, category: 'Electronics', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500', rating: 4.9 },
+        { title: 'Classic Casual Sports Sneakers', price: 5900, category: 'Fashion', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500', rating: 4.6 },
+        { title: 'Professional DSLR Camera 4K', price: 125000, category: 'Electronics', image: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500', rating: 5.0 },
+        { title: 'Minimalist Genuine Leather Wallet', price: 2500, category: 'Fashion', image: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=500', rating: 4.5 },
+        { title: 'Stainless Steel Insulated Water Bottle', price: 3200, category: 'Home & Living', image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=500', rating: 4.7 },
+        { title: 'Organic Glow Face Serum & Skincare', price: 4200, category: 'Beauty', image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=500', rating: 4.8 },
+        { title: 'Ergonomic Office Chair', price: 28500, category: 'Home & Living', image: 'https://images.unsplash.com/photo-1580481077494-e3299ac2510e?w=500', rating: 4.7 }
+      ]);
+      console.log('Initial products seeded successfully!');
+    }
+  } catch (err) {
+    console.error('Error seeding products:', err);
+  }
+}
+seedProducts();
