@@ -8,13 +8,18 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// MongoDB Connection
+// MongoDB Connection with detailed logs
 const MONGO_URI = process.env.MONGO_URI;
 
 if (MONGO_URI) {
   mongoose.connect(MONGO_URI)
-    .then(() => console.log('MongoDB Connected Successfully to KADEE.LK Mega Marketplace!'))
+    .then(() => {
+      console.log('MongoDB Connected Successfully to KADEE.LK Mega Marketplace!');
+      seedProducts();
+    })
     .catch((err) => console.error('MongoDB Connection Error:', err));
+} else {
+  console.error('MONGO_URI is missing in environment variables!');
 }
 
 // 1. User Schema
@@ -26,7 +31,7 @@ const userSchema = new mongoose.Schema({
 });
 const User = mongoose.model('User', userSchema);
 
-// 2. Product Schema with Reviews
+// 2. Product Schema
 const productSchema = new mongoose.Schema({
   title: String,
   price: Number,
@@ -49,7 +54,7 @@ const orderSchema = new mongoose.Schema({
 });
 const Order = mongoose.model('Order', orderSchema);
 
-// Auto-seed initial products if database is empty so home page shows items immediately
+// Auto-seed initial products
 async function seedProducts() {
   try {
     const count = await Product.countDocuments();
@@ -70,7 +75,6 @@ async function seedProducts() {
     console.error('Error seeding products:', err);
   }
 }
-seedProducts();
 
 // --- API ROUTES ---
 
@@ -83,7 +87,8 @@ app.post('/api/register', async (req, res) => {
     await newUser.save();
     res.json({ success: true, message: 'Registration successful!' });
   } catch (err) {
-    res.status(500).json({ error: 'Registration failed' });
+    console.error('Register error:', err);
+    res.status(500).json({ error: 'Registration failed due to server error' });
   }
 });
 
@@ -94,7 +99,8 @@ app.post('/api/login', async (req, res) => {
     if (!user) return res.status(400).json({ error: 'Invalid email or password!' });
     res.json({ success: true, user });
   } catch (err) {
-    res.status(500).json({ error: 'Login failed' });
+    console.error('Login error:', err);
+    res.status(500).json({ error: 'Login failed due to server error' });
   }
 });
 
@@ -103,6 +109,7 @@ app.get('/api/products', async (req, res) => {
     const products = await Product.find({});
     res.json(products);
   } catch (err) {
+    console.error('Fetch products error:', err);
     res.status(500).json({ error: 'Failed to fetch products' });
   }
 });
@@ -140,7 +147,7 @@ app.get('/api/admin/stats', async (req, res) => {
   }
 });
 
-// --- ADVANCED DARAZ / AMAZON STYLE FRONTEND UI ---
+// --- FRONTEND UI ---
 app.get('/', (req, res) => {
   res.send(`
     <!DOCTYPE html>
@@ -202,7 +209,7 @@ app.get('/', (req, res) => {
             </div>
         </header>
 
-        <!-- Categories & Navigation Bar -->
+        <!-- Categories Bar -->
         <nav class="bg-white shadow-sm border-b sticky top-[68px] z-40">
             <div class="container mx-auto px-6 py-2.5 flex space-x-8 overflow-x-auto text-sm font-bold text-gray-700">
                 <button onclick="filterCategory('All')" class="hover:text-orange-600 whitespace-nowrap flex items-center gap-1.5"><i class="fa-solid fa-fire text-orange-500"></i> All Categories</button>
@@ -213,7 +220,7 @@ app.get('/', (req, res) => {
             </div>
         </nav>
 
-        <!-- Hero Banner Showcase -->
+        <!-- Hero Banner -->
         <div class="container mx-auto px-6 mt-6">
             <div class="bg-gradient-to-r from-gray-900 via-orange-900 to-orange-600 rounded-2xl p-8 md:p-12 text-white shadow-2xl flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
                 <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl">🛍️</div>
@@ -238,7 +245,7 @@ app.get('/', (req, res) => {
             </div>
         </div>
 
-        <!-- Main Product Grid Section -->
+        <!-- Main Product Grid -->
         <main class="container mx-auto px-6 my-10">
             <div class="flex justify-between items-center mb-6 border-b pb-3">
                 <h2 class="text-2xl font-black text-gray-900 flex items-center gap-2"><i class="fa-solid fa-bolt text-orange-500"></i> Flash Sale & Trending Items</h2>
@@ -250,7 +257,7 @@ app.get('/', (req, res) => {
             </div>
         </main>
 
-        <!-- Auth Modal (Dinidu Ravishka as example placeholder) -->
+        <!-- Auth Modal -->
         <div id="authModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex justify-center items-center p-4">
             <div class="bg-white p-8 rounded-3xl w-full max-w-md shadow-2xl relative transform transition-all">
                 <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-black font-bold text-2xl">&times;</button>
@@ -336,7 +343,7 @@ app.get('/', (req, res) => {
             </div>
         </div>
 
-        <!-- Cart & Checkout Sidebar Drawer -->
+        <!-- Cart Sidebar -->
         <div id="cartModal" class="fixed right-0 top-0 w-full max-w-md h-full bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 p-6 flex flex-col">
             <div class="flex justify-between items-center border-b pb-4">
                 <h3 class="text-xl font-black text-gray-900 flex items-center gap-2"><i class="fa-solid fa-cart-shopping text-orange-600"></i> Shopping Cart</h3>
@@ -400,7 +407,7 @@ app.get('/', (req, res) => {
 
             function displayProducts(items) {
                 const grid = document.getElementById('productGrid');
-                if (items.length === 0) {
+                if (!items || items.length === 0) {
                     grid.innerHTML = '<p class="col-span-full text-center text-gray-400 py-12">No products available in this category.</p>';
                     return;
                 }
@@ -453,6 +460,8 @@ app.get('/', (req, res) => {
             async function handleAuthSubmit() {
                 const email = document.getElementById('authEmail').value;
                 const password = document.getElementById('authPassword').value;
+                if (!email || !password) { alert('Please enter email and password!'); return; }
+
                 if (isRegisterMode) {
                     const name = document.getElementById('regName').value;
                     const role = document.getElementById('regRole').value;
@@ -463,7 +472,7 @@ app.get('/', (req, res) => {
                     });
                     const data = await res.json();
                     if (data.success) { alert('Registration successful! Please login.'); toggleAuthMode(); }
-                    else { alert(data.error); }
+                    else { alert(data.error || 'Registration failed'); }
                 } else {
                     const res = await fetch('/api/login', {
                         method: 'POST',
@@ -477,7 +486,7 @@ app.get('/', (req, res) => {
                         closeAuthModal();
                         updateUIState();
                         alert('Welcome back, ' + currentUser.name + '!');
-                    } else { alert(data.error); }
+                    } else { alert(data.error || 'Login failed! Check your email and password.'); }
                 }
             }
 
@@ -564,7 +573,7 @@ app.get('/', (req, res) => {
                                 <div>
                                     <h4 class="font-bold text-sm line-clamp-1">\${item.title}</h4>
                                     <span class="text-orange-600 font-extrabold text-xs">LKR \${item.price.toLocaleString()}</span>
-                                }
+                                </div>
                             </div>
                             <button onclick="removeFromCart(\${index})" class="text-red-500 hover:text-red-700 p-2"><i class="fa-solid fa-trash"></i></button>
                         </div>
