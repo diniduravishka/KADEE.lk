@@ -13,7 +13,7 @@ const MONGO_URI = process.env.MONGO_URI;
 
 if (MONGO_URI) {
   mongoose.connect(MONGO_URI)
-    .then(() => console.log('MongoDB Connected Successfully to KADEE.LK Ultimate Marketplace!'))
+    .then(() => console.log('MongoDB Connected Successfully to KADEE.LK Mega Marketplace!'))
     .catch((err) => console.error('MongoDB Connection Error:', err));
 }
 
@@ -33,18 +33,18 @@ const productSchema = new mongoose.Schema({
   category: String,
   image: String,
   sellerEmail: String,
-  rating: { type: Number, default: 4.5 },
+  rating: { type: Number, default: 4.8 },
   reviews: [{ user: String, comment: String, rating: Number }]
 });
 const Product = mongoose.model('Product', productSchema);
 
-// 3. Order Schema for Checkout & PayHere
+// 3. Order Schema
 const orderSchema = new mongoose.Schema({
   buyerEmail: String,
   items: Array,
   totalAmount: Number,
   paymentMethod: String,
-  status: { type: String, default: 'Pending' },
+  status: { type: String, default: 'Processing' },
   date: { type: Date, default: Date.now }
 });
 const Order = mongoose.model('Order', orderSchema);
@@ -95,7 +95,6 @@ app.post('/api/products', async (req, res) => {
   }
 });
 
-// Add Review to Product
 app.post('/api/products/:id/review', async (req, res) => {
   try {
     const { user, comment, rating } = req.body;
@@ -109,7 +108,6 @@ app.post('/api/products/:id/review', async (req, res) => {
   }
 });
 
-// Checkout Route (PayHere / COD)
 app.post('/api/checkout', async (req, res) => {
   try {
     const { buyerEmail, items, totalAmount, paymentMethod } = req.body;
@@ -121,7 +119,6 @@ app.post('/api/checkout', async (req, res) => {
   }
 });
 
-// Admin Stats Route
 app.get('/api/admin/stats', async (req, res) => {
   try {
     const userCount = await User.countDocuments();
@@ -133,7 +130,7 @@ app.get('/api/admin/stats', async (req, res) => {
   }
 });
 
-// --- FRONTEND UI (Daraz/Amazon Style Mega Marketplace) ---
+// --- ADVANCED DARAZ / AMAZON STYLE FRONTEND UI ---
 app.get('/', (req, res) => {
   res.send(`
     <!DOCTYPE html>
@@ -141,165 +138,223 @@ app.get('/', (req, res) => {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>KADEE.LK - Sri Lanka's Mega Marketplace</title>
+        <title>KADEE.LK - Sri Lanka's Mega Marketplace | Daraz & Amazon Style</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+            body { font-family: 'Poppins', sans-serif; }
+        </style>
     </head>
-    <body class="bg-gray-100 font-sans">
+    <body class="bg-gray-100 text-gray-800">
 
-        <!-- Top Header -->
-        <div class="bg-orange-600 text-white text-xs py-1 px-4 flex justify-between items-center">
-            <span>🔥 KADEE.LK - Mega Online Shopping Mall, PayHere & Seller Hub</span>
-            <div class="flex space-x-4 items-center">
-                <span id="userDisplay" class="font-bold text-yellow-200"></span>
-                <button id="authBtn" onclick="openAuthModal()" class="bg-yellow-400 text-orange-900 px-2 py-0.5 rounded font-bold hover:bg-yellow-300">Login / Register</button>
-                <button id="logoutBtn" onclick="logout()" class="hidden bg-red-500 px-2 py-0.5 rounded font-bold">Logout</button>
+        <!-- Top Announcement Bar -->
+        <div class="bg-gradient-to-r from-orange-600 via-amber-600 to-orange-500 text-white text-xs py-2 px-6 flex justify-between items-center shadow-inner">
+            <div class="flex items-center gap-2">
+                <span class="bg-yellow-400 text-orange-950 px-2 py-0.5 rounded font-extrabold animate-pulse">MEGA SALE</span>
+                <span>🔥 දිවයින පුරා බෙදාහැරීම සහ PayHere / COD පහසුකම් සමඟ!</span>
+            </div>
+            <div class="flex space-x-6 items-center font-medium">
+                <span id="userDisplay" class="text-yellow-200"></span>
+                <button id="authBtn" onclick="openAuthModal()" class="bg-white text-orange-600 px-3 py-1 rounded-full font-bold hover:bg-yellow-300 hover:text-orange-900 transition shadow">Login / Register</button>
+                <button id="logoutBtn" onclick="logout()" class="hidden bg-red-600 text-white px-3 py-1 rounded-full font-bold hover:bg-red-700 transition">Logout</button>
             </div>
         </div>
 
-        <!-- Main Navbar -->
-        <header class="bg-orange-500 text-white shadow-md sticky top-0 z-50">
-            <div class="container mx-auto px-4 py-3 flex items-center justify-between">
-                <a href="/" class="text-2xl font-black tracking-wider flex items-center gap-2">
-                    <i class="fa-solid fa-store"></i> KADEE<span class="text-yellow-300">.LK</span>
+        <!-- Sticky Mega Header -->
+        <header class="bg-orange-500 text-white shadow-lg sticky top-0 z-50">
+            <div class="container mx-auto px-6 py-3 flex items-center justify-between gap-4">
+                <!-- Logo -->
+                <a href="/" class="text-3xl font-black tracking-wider flex items-center gap-2 drop-shadow">
+                    <div class="bg-white text-orange-600 p-2 rounded-xl shadow"><i class="fa-solid fa-store"></i></div>
+                    KADEE<span class="text-yellow-300">.LK</span>
                 </a>
                
-                <div class="flex-1 mx-8 max-w-2xl relative">
-                    <input type="text" id="searchInput" placeholder="Search products, brands and categories..." class="w-full py-2 px-4 rounded-l text-gray-800 focus:outline-none">
-                    <button onclick="searchProducts()" class="absolute right-0 top-0 bg-yellow-400 text-orange-900 px-6 py-2 rounded-r font-bold hover:bg-yellow-300">
+                <!-- Search Box -->
+                <div class="flex-1 max-w-3xl relative hidden md:block">
+                    <input type="text" id="searchInput" placeholder="Search for products, brands and categories in KADEE.LK..." class="w-full py-3 px-5 rounded-l-xl text-gray-800 focus:outline-none shadow-inner font-medium">
+                    <button onclick="searchProducts()" class="absolute right-0 top-0 bg-yellow-400 text-orange-950 px-8 py-3 rounded-r-xl font-extrabold hover:bg-yellow-300 transition shadow">
                         <i class="fa-solid fa-search"></i>
                     </button>
                 </div>
 
+                <!-- Right Action Buttons -->
                 <div class="flex items-center space-x-4">
-                    <button id="adminDashboardBtn" onclick="openAdminModal()" class="hidden bg-purple-600 text-white px-3 py-1 rounded font-bold text-sm hover:bg-purple-700">
-                        <i class="fa-solid fa-gauge"></i> Admin Panel
+                    <button id="adminDashboardBtn" onclick="openAdminModal()" class="hidden bg-purple-700 hover:bg-purple-800 text-white px-4 py-2 rounded-xl font-bold text-sm shadow transition flex items-center gap-2">
+                        <i class="fa-solid fa-gauge-high"></i> Admin Panel
                     </button>
-                    <button id="sellerDashboardBtn" onclick="openSellerModal()" class="hidden bg-yellow-300 text-orange-900 px-3 py-1 rounded font-bold text-sm hover:bg-yellow-400">
-                        <i class="fa-solid fa-box-open"></i> Seller Hub
+                    <button id="sellerDashboardBtn" onclick="openSellerModal()" class="hidden bg-yellow-300 hover:bg-yellow-400 text-orange-950 px-4 py-2 rounded-xl font-bold text-sm shadow transition flex items-center gap-2">
+                        <i class="fa-solid fa-box-archive"></i> Seller Hub
                     </button>
-                    <div class="relative cursor-pointer flex items-center gap-1" onclick="toggleCart()">
-                        <i class="fa-solid fa-cart-shopping text-2xl"></i>
-                        <span id="cartCount" class="bg-yellow-300 text-orange-900 rounded-full px-2 text-xs font-bold">0</span>
-                        <span class="hidden md:inline font-semibold">Cart</span>
+                    <div class="relative cursor-pointer flex items-center gap-2 bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded-xl transition shadow" onclick="toggleCart()">
+                        <i class="fa-solid fa-cart-shopping text-xl"></i>
+                        <span id="cartCount" class="bg-yellow-300 text-orange-950 rounded-full px-2 py-0.5 text-xs font-black">0</span>
+                        <span class="hidden lg:inline font-bold">Cart</span>
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- Category Bar -->
-        <div class="bg-white shadow-sm border-b">
-            <div class="container mx-auto px-4 py-2 flex space-x-6 overflow-x-auto text-sm font-semibold text-gray-700">
-                <button onclick="filterCategory('All')" class="hover:text-orange-600 whitespace-nowrap">🔥 All Categories</button>
-                <button onclick="filterCategory('Electronics')" class="hover:text-orange-600 whitespace-nowrap">💻 Electronics</button>
-                <button onclick="filterCategory('Fashion')" class="hover:text-orange-600 whitespace-nowrap">👕 Fashion</button>
-                <button onclick="filterCategory('Home & Living')" class="hover:text-orange-600 whitespace-nowrap">🏠 Home & Living</button>
+        <!-- Categories & Navigation Bar -->
+        <nav class="bg-white shadow-sm border-b sticky top-[68px] z-40">
+            <div class="container mx-auto px-6 py-2.5 flex space-x-8 overflow-x-auto text-sm font-bold text-gray-700">
+                <button onclick="filterCategory('All')" class="hover:text-orange-600 whitespace-nowrap flex items-center gap-1.5"><i class="fa-solid fa-fire text-orange-500"></i> All Categories</button>
+                <button onclick="filterCategory('Electronics')" class="hover:text-orange-600 whitespace-nowrap flex items-center gap-1.5"><i class="fa-solid fa-laptop"></i> Electronics</button>
+                <button onclick="filterCategory('Fashion')" class="hover:text-orange-600 whitespace-nowrap flex items-center gap-1.5"><i class="fa-solid fa-shirt"></i> Fashion & Clothing</button>
+                <button onclick="filterCategory('Home & Living')" class="hover:text-orange-600 whitespace-nowrap flex items-center gap-1.5"><i class="fa-solid fa-house-chimney"></i> Home & Living</button>
+                <button onclick="filterCategory('Beauty')" class="hover:text-orange-600 whitespace-nowrap flex items-center gap-1.5"><i class="fa-solid fa-spa"></i> Beauty & Health</button>
             </div>
-        </div>
+        </nav>
 
-        <!-- Hero Section -->
-        <div class="container mx-auto px-4 mt-4">
-            <div class="bg-gradient-to-r from-orange-600 to-yellow-500 rounded-lg p-8 text-white shadow-lg flex justify-between items-center">
-                <div>
-                    <h1 class="text-3xl md:text-5xl font-extrabold mb-2">Mega Marketplace & PayHere Gateway</h1>
-                    <p class="text-lg mb-4">Shop securely with PayHere online payments or Cash on Delivery across Sri Lanka!</p>
+        <!-- Hero Banner Showcase (Daraz/Amazon style) -->
+        <div class="container mx-auto px-6 mt-6">
+            <div class="bg-gradient-to-r from-gray-900 via-orange-900 to-orange-600 rounded-2xl p-8 md:p-12 text-white shadow-2xl flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl">🛍️</div>
+                <div class="z-10 max-w-xl">
+                    <span class="bg-yellow-400 text-orange-950 text-xs px-3 py-1 rounded-full font-black uppercase tracking-wider">Sri Lanka's #1 Marketplace</span>
+                    <h1 class="text-3xl md:text-5xl font-black mt-3 mb-4 leading-tight">Shop Smart, Live Better with KADEE.LK</h1>
+                    <p class="text-gray-200 mb-6 font-light">Experience lightning-fast delivery, secured PayHere online checkout, and trusted local vendors all in one mega platform.</p>
+                    <div class="flex gap-4">
+                        <button onclick="window.scrollTo({top: 600, behavior: 'smooth'})" class="bg-yellow-400 text-orange-950 font-extrabold px-8 py-3 rounded-xl shadow-lg hover:bg-yellow-300 transition">Start Shopping</button>
+                        <button onclick="openAuthModal()" class="border-2 border-white text-white font-bold px-6 py-3 rounded-xl hover:bg-white hover:text-gray-900 transition">Join as Seller</button>
+                    </div>
                 </div>
-                <div class="text-6xl hidden md:block">🚀</div>
+                <div class="mt-8 md:mt-0 z-10 text-center bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20 shadow-xl">
+                    <div class="text-yellow-300 font-black text-2xl">🔥 FLASH SALE</div>
+                    <p class="text-sm text-gray-200 mt-1">Up to 60% OFF on Top Electronics</p>
+                    <div class="mt-4 flex gap-2 justify-center font-mono text-lg font-bold">
+                        <span class="bg-black/50 px-3 py-1 rounded">08</span>:
+                        <span class="bg-black/50 px-3 py-1 rounded">45</span>:
+                        <span class="bg-black/50 px-3 py-1 rounded">22</span>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Products Listing -->
-        <main class="container mx-auto px-4 my-8">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">Trending Products & Flash Sale</h2>
-            <div id="productGrid" class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <div class="text-center col-span-full py-12 text-gray-500">Loading marketplace...</div>
+        <!-- Main Product Grid Section -->
+        <main class="container mx-auto px-6 my-10">
+            <div class="flex justify-between items-center mb-6 border-b pb-3">
+                <h2 class="text-2xl font-black text-gray-900 flex items-center gap-2"><i class="fa-solid fa-bolt text-orange-500"></i> Flash Sale & Trending Items</h2>
+                <span class="text-sm font-semibold text-gray-500">Showing curated mega collection</span>
+            </div>
+           
+            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div class="text-center col-span-full py-16 text-gray-400 font-medium">Loading mega marketplace...</div>
             </div>
         </main>
 
         <!-- Auth Modal -->
-        <div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex justify-center items-center">
-            <div class="bg-white p-8 rounded-lg w-96 shadow-2xl relative">
-                <button onclick="closeAuthModal()" class="absolute top-3 right-3 text-gray-500 font-bold text-xl">&times;</button>
-                <h3 id="authTitle" class="text-2xl font-bold mb-4 text-orange-600">Login to KADEE.LK</h3>
-                <div id="registerFields" class="hidden space-y-3 mb-3">
-                    <input type="text" id="regName" placeholder="Full Name" class="w-full p-2 border rounded">
-                    <select id="regRole" class="w-full p-2 border rounded">
-                        <option value="buyer">Buyer (Customer)</option>
-                        <option value="seller">Seller (Vendor)</option>
-                        <option value="admin">Admin (Manager)</option>
-                    </select>
+        <div id="authModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex justify-center items-center p-4">
+            <div class="bg-white p-8 rounded-3xl w-full max-w-md shadow-2xl relative transform transition-all">
+                <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-black font-bold text-2xl">&times;</button>
+                <h3 id="authTitle" class="text-2xl font-black mb-6 text-gray-900">Login to KADEE.LK</h3>
+                <div id="registerFields" class="hidden space-y-4 mb-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Full Name</label>
+                        <input type="text" id="regName" placeholder="e.g. Nuwan Perera" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Account Role</label>
+                        <select id="regRole" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none font-medium">
+                            <option value="buyer">Buyer (Customer)</option>
+                            <option value="seller">Seller (Vendor Hub)</option>
+                            <option value="admin">Admin (Manager)</option>
+                        </select>
+                    </div>
                 </div>
-                <input type="email" id="authEmail" placeholder="Email Address" class="w-full p-2 border rounded mb-3">
-                <input type="password" id="authPassword" placeholder="Password" class="w-full p-2 border rounded mb-4">
-                <button onclick="handleAuthSubmit()" id="authSubmitBtn" class="w-full bg-orange-500 text-white py-2 rounded font-bold hover:bg-orange-600">Login</button>
-                <p class="text-sm text-center mt-4">
+                <div class="space-y-4 mb-6">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Email Address</label>
+                        <input type="email" id="authEmail" placeholder="name@example.com" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Password</label>
+                        <input type="password" id="authPassword" placeholder="••••••••" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none">
+                    </div>
+                </div>
+                <button onclick="handleAuthSubmit()" id="authSubmitBtn" class="w-full bg-orange-600 text-white py-3 rounded-xl font-bold hover:bg-orange-700 transition shadow-lg">Login</button>
+                <p class="text-sm text-center mt-6 text-gray-600">
                     <span id="authToggleText">Don't have an account?</span>
-                    <button onclick="toggleAuthMode()" class="text-orange-600 font-bold underline">Register here</button>
+                    <button onclick="toggleAuthMode()" class="text-orange-600 font-extrabold underline ml-1">Register here</button>
                 </p>
             </div>
         </div>
 
         <!-- Seller Hub Modal -->
-        <div id="sellerModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex justify-center items-center">
-            <div class="bg-white p-8 rounded-lg w-96 shadow-2xl relative">
-                <button onclick="openSellerModal()" class="absolute top-3 right-3 text-gray-500 font-bold text-xl">&times;</button>
-                <h3 class="text-2xl font-bold mb-4 text-orange-600">Seller Hub - Add Product</h3>
-                <input type="text" id="prodTitle" placeholder="Product Title" class="w-full p-2 border rounded mb-3">
-                <input type="number" id="prodPrice" placeholder="Price (LKR)" class="w-full p-2 border rounded mb-3">
-                <input type="text" id="prodCategory" placeholder="Category (Electronics/Fashion/Home)" class="w-full p-2 border rounded mb-3">
-                <input type="text" id="prodImage" placeholder="Image URL (Unsplash link)" class="w-full p-2 border rounded mb-4">
-                <button onclick="addNewProduct()" class="w-full bg-orange-500 text-white py-2 rounded font-bold hover:bg-orange-600">Publish Product</button>
+        <div id="sellerModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex justify-center items-center p-4">
+            <div class="bg-white p-8 rounded-3xl w-full max-w-md shadow-2xl relative">
+                <button onclick="openSellerModal()" class="absolute top-4 right-4 text-gray-400 hover:text-black font-bold text-2xl">&times;</button>
+                <h3 class="text-2xl font-black mb-6 text-orange-600 flex items-center gap-2"><i class="fa-solid fa-box-open"></i> Seller Hub</h3>
+                <div class="space-y-4 mb-6">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Product Title</label>
+                        <input type="text" id="prodTitle" placeholder="e.g. Wireless Gaming Headset" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Price (LKR)</label>
+                        <input type="number" id="prodPrice" placeholder="4500" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Category</label>
+                        <input type="text" id="prodCategory" placeholder="Electronics / Fashion / Home" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Image URL</label>
+                        <input type="text" id="prodImage" placeholder="https://images.unsplash.com/..." class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-orange-500">
+                    </div>
+                </div>
+                <button onclick="addNewProduct()" class="w-full bg-orange-600 text-white py-3 rounded-xl font-bold hover:bg-orange-700 transition shadow-lg">Publish Product</button>
             </div>
         </div>
 
         <!-- Admin Dashboard Modal -->
-        <div id="adminModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex justify-center items-center">
-            <div class="bg-white p-8 rounded-lg w-11/12 md:w-2/3 max-h-[80vh] overflow-y-auto shadow-2xl relative">
-                <button onclick="openAdminModal()" class="absolute top-3 right-3 text-gray-500 font-bold text-xl">&times;</button>
-                <h3 class="text-2xl font-bold mb-4 text-purple-600"><i class="fa-solid fa-gauge"></i> Admin Dashboard</h3>
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="bg-purple-100 p-4 rounded-lg text-center">
-                        <h4 class="text-gray-600 font-semibold">Total Users</h4>
-                        <p id="adminUserCount" class="text-2xl font-bold text-purple-700">0</p>
+        <div id="adminModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex justify-center items-center p-4">
+            <div class="bg-white p-8 rounded-3xl w-full max-w-3xl max-h-[85vh] overflow-y-auto shadow-2xl relative">
+                <button onclick="openAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-black font-bold text-2xl">&times;</button>
+                <h3 class="text-2xl font-black mb-6 text-purple-700 flex items-center gap-2"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-purple-50 p-6 rounded-2xl border border-purple-100 text-center">
+                        <h4 class="text-gray-600 font-semibold text-sm">Total Registered Users</h4>
+                        <p id="adminUserCount" class="text-4xl font-black text-purple-700 mt-2">0</p>
                     </div>
-                    <div class="bg-orange-100 p-4 rounded-lg text-center">
-                        <h4 class="text-gray-600 font-semibold">Total Products</h4>
-                        <p id="adminProdCount" class="text-2xl font-bold text-orange-700">0</p>
+                    <div class="bg-orange-50 p-6 rounded-2xl border border-orange-100 text-center">
+                        <h4 class="text-gray-600 font-semibold text-sm">Total Active Products</h4>
+                        <p id="adminProdCount" class="text-4xl font-black text-orange-600 mt-2">0</p>
                     </div>
                 </div>
-                <h4 class="font-bold text-lg mb-2">Recent Customer Orders</h4>
-                <div id="adminOrdersList" class="space-y-2 text-sm">
-                    <p class="text-gray-500">Loading orders...</p>
+                <h4 class="font-bold text-lg mb-4 text-gray-900">Recent Customer Orders (PayHere & COD)</h4>
+                <div id="adminOrdersList" class="space-y-3 text-sm">
+                    <p class="text-gray-400">Loading orders...</p>
                 </div>
             </div>
         </div>
 
-        <!-- Cart & Checkout Sidebar -->
-        <div id="cartModal" class="fixed right-0 top-0 w-96 h-full bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 p-6 flex flex-col">
+        <!-- Cart & Checkout Sidebar Drawer -->
+        <div id="cartModal" class="fixed right-0 top-0 w-full max-w-md h-full bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 p-6 flex flex-col">
             <div class="flex justify-between items-center border-b pb-4">
-                <h3 class="text-xl font-bold text-gray-800">Your Shopping Cart</h3>
-                <button onclick="toggleCart()" class="text-gray-500 hover:text-black font-bold text-xl">&times;</button>
+                <h3 class="text-xl font-black text-gray-900 flex items-center gap-2"><i class="fa-solid fa-cart-shopping text-orange-600"></i> Shopping Cart</h3>
+                <button onclick="toggleCart()" class="text-gray-400 hover:text-black font-bold text-2xl">&times;</button>
             </div>
             <div id="cartItems" class="flex-1 overflow-y-auto py-4 space-y-4">
-                <p class="text-gray-500 text-center">Your cart is empty.</p>
+                <p class="text-gray-400 text-center py-8">Your cart is currently empty.</p>
             </div>
-            <div class="border-t pt-4 space-y-3">
-                <div class="flex justify-between font-bold text-lg">
-                    <span>Total:</span>
-                    <span id="cartTotal">LKR 0</span>
+            <div class="border-t pt-4 space-y-4">
+                <div class="flex justify-between font-black text-xl">
+                    <span>Subtotal:</span>
+                    <span id="cartTotal" class="text-orange-600">LKR 0</span>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Select Payment Method:</label>
-                    <select id="paymentMethod" class="w-full p-2 border rounded text-sm">
-                        <option value="PayHere">PayHere Online Payment Gateway</option>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Select Checkout Payment Method:</label>
+                    <select id="paymentMethod" class="w-full p-3 border rounded-xl text-sm font-semibold focus:ring-2 focus:ring-orange-500 outline-none">
+                        <option value="PayHere">PayHere Secured Online Gateway</option>
                         <option value="COD">Cash on Delivery (COD)</option>
                     </select>
                 </div>
-                <button onclick="checkout()" class="w-full bg-orange-500 text-white py-3 rounded font-bold hover:bg-orange-600">Proceed to Checkout</button>
+                <button onclick="checkout()" class="w-full bg-orange-600 text-white py-3.5 rounded-xl font-black hover:bg-orange-700 transition shadow-lg">Proceed to Checkout</button>
             </div>
         </div>
 
-        <!-- Frontend Script -->
+        <!-- Frontend JavaScript -->
         <script>
             let products = [];
             let cart = [];
@@ -308,7 +363,7 @@ app.get('/', (req, res) => {
 
             function updateUIState() {
                 if (currentUser) {
-                    document.getElementById('userDisplay').innerText = \`Hello, \${currentUser.name} (\${currentUser.role})\`;
+                    document.getElementById('userDisplay').innerText = \`👤 \${currentUser.name} (\${currentUser.role})\`;
                     document.getElementById('authBtn').classList.add('hidden');
                     document.getElementById('logoutBtn').classList.remove('hidden');
                     if (currentUser.role === 'seller' || currentUser.role === 'admin') {
@@ -327,29 +382,41 @@ app.get('/', (req, res) => {
             }
 
             async function fetchProducts() {
-                const res = await fetch('/api/products');
-                products = await res.json();
-                displayProducts(products);
+                try {
+                    const res = await fetch('/api/products');
+                    products = await res.json();
+                    displayProducts(products);
+                } catch (err) {
+                    console.error('Error fetching products', err);
+                }
             }
 
             function displayProducts(items) {
                 const grid = document.getElementById('productGrid');
                 if (items.length === 0) {
-                    grid.innerHTML = '<p class="col-span-full text-center text-gray-500">No products available.</p>';
+                    grid.innerHTML = '<p class="col-span-full text-center text-gray-400 py-12">No products available in this category.</p>';
                     return;
                 }
                 grid.innerHTML = items.map(p => \`
-                    <div class="bg-white rounded-lg shadow hover:shadow-lg transition p-4 flex flex-col justify-between">
+                    <div class="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 p-4 flex flex-col justify-between border border-gray-100 group">
                         <div>
-                            <img src="\${p.image}" alt="\${p.title}" class="w-full h-48 object-cover rounded mb-3">
-                            <span class="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded font-semibold">\${p.category}</span>
-                            <h3 class="font-bold text-gray-800 mt-2 text-sm md:text-base">\${p.title}</h3>
-                            <div class="text-yellow-500 text-xs mt-1">⭐ \${p.rating} / 5 (\${p.reviews ? p.reviews.length : 0} reviews)</div>
+                            <div class="relative overflow-hidden rounded-xl mb-3 bg-gray-100">
+                                <img src="\${p.image}" alt="\${p.title}" class="w-full h-52 object-cover group-hover:scale-105 transition duration-300">
+                                <span class="absolute top-2 left-2 bg-orange-600 text-white text-[10px] uppercase font-black px-2.5 py-1 rounded-full shadow">\${p.category}</span>
+                            </div>
+                            <h3 class="font-bold text-gray-900 mt-2 text-sm md:text-base line-clamp-2">\${p.title}</h3>
+                            <div class="flex items-center gap-1 text-yellow-500 text-xs mt-1.5 font-semibold">
+                                <span>⭐ \${p.rating}</span>
+                                <span class="text-gray-400">(\${p.reviews ? p.reviews.length : 0} reviews)</span>
+                            </div>
                         </div>
-                        <div class="mt-4">
-                            <div class="text-orange-600 font-extrabold text-lg">LKR \${p.price.toLocaleString()}</div>
-                            <button onclick="addToCart('\${p._id}')" class="mt-2 w-full bg-orange-500 text-white py-2 rounded text-sm font-bold hover:bg-orange-600">
-                                <i class="fa-solid fa-cart-plus"></i> Add to Cart
+                        <div class="mt-4 pt-3 border-t border-gray-50 flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] text-gray-400 block font-medium">Price</span>
+                                <div class="text-orange-600 font-black text-lg">LKR \${p.price.toLocaleString()}</div>
+                            </div>
+                            <button onclick="addToCart('\${p._id}')" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-cart-plus"></i> Add
                             </button>
                         </div>
                     </div>
@@ -360,18 +427,19 @@ app.get('/', (req, res) => {
                 if (cat === 'All') {
                     displayProducts(products);
                 } else {
-                    const filtered = products.filter(p => p.category === cat);
+                    const filtered = products.filter(p => p.category.toLowerCase().includes(cat.toLowerCase()));
                     displayProducts(filtered);
                 }
             }
 
             function openAuthModal() { document.getElementById('authModal').classList.remove('hidden'); }
             function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
+           
             function toggleAuthMode() {
                 isRegisterMode = !isRegisterMode;
-                document.getElementById('authTitle').innerText = isRegisterMode ? 'Register on KADEE.LK' : 'Login to KADEE.LK';
+                document.getElementById('authTitle').innerText = isRegisterMode ? 'Create KADEE.LK Account' : 'Login to KADEE.LK';
                 document.getElementById('registerFields').classList.toggle('hidden');
-                document.getElementById('authSubmitBtn').innerText = isRegisterMode ? 'Register' : 'Login';
+                document.getElementById('authSubmitBtn').innerText = isRegisterMode ? 'Register Now' : 'Login';
                 document.getElementById('authToggleText').innerText = isRegisterMode ? 'Already have an account?' : "Don't have an account?";
             }
 
@@ -387,7 +455,7 @@ app.get('/', (req, res) => {
                         body: JSON.stringify({ name, email, password, role })
                     });
                     const data = await res.json();
-                    if (data.success) { alert('Registered successfully! Please login.'); toggleAuthMode(); }
+                    if (data.success) { alert('Registration successful! Please login.'); toggleAuthMode(); }
                     else { alert(data.error); }
                 } else {
                     const res = await fetch('/api/login', {
@@ -401,7 +469,7 @@ app.get('/', (req, res) => {
                         localStorage.setItem('kadee_user', JSON.stringify(currentUser));
                         closeAuthModal();
                         updateUIState();
-                        alert('Login successful!');
+                        alert('Welcome back, ' + currentUser.name + '!');
                     } else { alert(data.error); }
                 }
             }
@@ -420,6 +488,8 @@ app.get('/', (req, res) => {
                 const price = Number(document.getElementById('prodPrice').value);
                 const category = document.getElementById('prodCategory').value;
                 const image = document.getElementById('prodImage').value;
+                if (!title || !price || !category || !image) { alert('Please fill in all product details!'); return; }
+               
                 const res = await fetch('/api/products', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -427,7 +497,7 @@ app.get('/', (req, res) => {
                 });
                 const data = await res.json();
                 if (data.success) {
-                    alert('Product published successfully!');
+                    alert('Product published successfully on KADEE.LK!');
                     openSellerModal();
                     fetchProducts();
                 }
@@ -443,15 +513,15 @@ app.get('/', (req, res) => {
                     document.getElementById('adminProdCount').innerText = stats.productCount;
                     const ordersList = document.getElementById('adminOrdersList');
                     if (stats.orders.length === 0) {
-                        ordersList.innerHTML = '<p class="text-gray-500">No orders yet.</p>';
+                        ordersList.innerHTML = '<p class="text-gray-400">No orders received yet.</p>';
                     } else {
                         ordersList.innerHTML = stats.orders.map(o => \`
-                            <div class="bg-gray-50 p-3 rounded border flex justify-between items-center">
+                            <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex justify-between items-center shadow-sm">
                                 <div>
-                                    <span class="font-bold text-xs text-purple-600">\${o.buyerEmail}</span>
-                                    <p class="text-xs text-gray-600">Total: LKR \${o.totalAmount.toLocaleString()} (\${o.paymentMethod})</p>
+                                    <span class="font-black text-xs text-purple-700">\${o.buyerEmail}</span>
+                                    <p class="text-xs text-gray-600 mt-0.5">Total: <b>LKR \${o.totalAmount.toLocaleString()}</b> via \${o.paymentMethod}</p>
                                 </div>
-                                <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">\${o.status}</span>
+                                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-extrabold">\${o.status}</span>
                             </div>
                         \`).join('');
                     }
@@ -473,7 +543,7 @@ app.get('/', (req, res) => {
                 document.getElementById('cartCount').innerText = cart.length;
                 const container = document.getElementById('cartItems');
                 if (cart.length === 0) {
-                    container.innerHTML = '<p class="text-gray-500 text-center">Your cart is empty.</p>';
+                    container.innerHTML = '<p class="text-gray-400 text-center py-8">Your cart is currently empty.</p>';
                     document.getElementById('cartTotal').innerText = 'LKR 0';
                     return;
                 }
@@ -481,12 +551,15 @@ app.get('/', (req, res) => {
                 container.innerHTML = cart.map((item, index) => {
                     total += item.price;
                     return \`
-                        <div class="flex justify-between items-center border-b pb-2">
-                            <div>
-                                <h4 class="font-semibold text-sm">\${item.title}</h4>
-                                <span class="text-orange-600 font-bold text-sm">LKR \${item.price.toLocaleString()}</span>
+                        <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border">
+                            <div class="flex items-center gap-3">
+                                <img src="\${item.image}" class="w-12 h-12 object-cover rounded-lg">
+                                <div>
+                                    <h4 class="font-bold text-sm line-clamp-1">\${item.title}</h4>
+                                    <span class="text-orange-600 font-extrabold text-xs">LKR \${item.price.toLocaleString()}</span>
+                                </div>
                             </div>
-                            <button onclick="removeFromCart(\${index})" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
+                            <button onclick="removeFromCart(\${index})" class="text-red-500 hover:text-red-700 p-2"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     \`;
                 }).join('');
@@ -497,8 +570,8 @@ app.get('/', (req, res) => {
             function toggleCart() { document.getElementById('cartModal').classList.toggle('translate-x-full'); }
 
             async function checkout() {
-                if (!currentUser) { alert('Please login to proceed with checkout!'); openAuthModal(); return; }
-                if (cart.length === 0) { alert('Cart is empty'); return; }
+                if (!currentUser) { alert('Please login or register to complete your checkout!'); openAuthModal(); return; }
+                if (cart.length === 0) { alert('Your cart is empty!'); return; }
                 const paymentMethod = document.getElementById('paymentMethod').value;
                 const totalAmount = cart.reduce((sum, item) => sum + item.price, 0);
 
@@ -510,7 +583,7 @@ app.get('/', (req, res) => {
                 const data = await res.json();
                 if (data.success) {
                     if (paymentMethod === 'PayHere') {
-                        alert('Redirecting to PayHere secure payment gateway simulation...');
+                        alert('Redirecting to PayHere secure payment gateway simulation... Order Successful!');
                     } else {
                         alert('Order placed successfully via Cash on Delivery (COD)!');
                     }
@@ -518,7 +591,7 @@ app.get('/', (req, res) => {
                     updateCartUI();
                     toggleCart();
                 } else {
-                    alert('Checkout failed.');
+                    alert('Checkout failed. Please try again.');
                 }
             }
 
