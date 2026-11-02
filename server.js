@@ -49,6 +49,29 @@ const orderSchema = new mongoose.Schema({
 });
 const Order = mongoose.model('Order', orderSchema);
 
+// Auto-seed initial products if database is empty so home page shows items immediately
+async function seedProducts() {
+  try {
+    const count = await Product.countDocuments();
+    if (count === 0) {
+      await Product.insertMany([
+        { title: 'Wireless Bluetooth Gaming Headphones', price: 8500, category: 'Electronics', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500', rating: 4.8 },
+        { title: 'Smart Watch Series 8 Ultra', price: 15400, category: 'Electronics', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500', rating: 4.9 },
+        { title: 'Classic Casual Sports Sneakers', price: 5900, category: 'Fashion', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500', rating: 4.6 },
+        { title: 'Professional DSLR Camera 4K', price: 125000, category: 'Electronics', image: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500', rating: 5.0 },
+        { title: 'Minimalist Genuine Leather Wallet', price: 2500, category: 'Fashion', image: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=500', rating: 4.5 },
+        { title: 'Stainless Steel Insulated Water Bottle', price: 3200, category: 'Home & Living', image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=500', rating: 4.7 },
+        { title: 'Organic Glow Face Serum & Skincare', price: 4200, category: 'Beauty', image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=500', rating: 4.8 },
+        { title: 'Ergonomic Office Chair', price: 28500, category: 'Home & Living', image: 'https://images.unsplash.com/photo-1580481077494-e3299ac2510e?w=500', rating: 4.7 }
+      ]);
+      console.log('Initial mega products seeded successfully!');
+    }
+  } catch (err) {
+    console.error('Error seeding products:', err);
+  }
+}
+seedProducts();
+
 // --- API ROUTES ---
 
 app.post('/api/register', async (req, res) => {
@@ -95,19 +118,6 @@ app.post('/api/products', async (req, res) => {
   }
 });
 
-app.post('/api/products/:id/review', async (req, res) => {
-  try {
-    const { user, comment, rating } = req.body;
-    const product = await Product.findById(req.params.id);
-    if (!product) return res.status(404).json({ error: 'Product not found' });
-    product.reviews.push({ user, comment, rating });
-    await product.save();
-    res.json({ success: true, message: 'Review added successfully!' });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to add review' });
-  }
-});
-
 app.post('/api/checkout', async (req, res) => {
   try {
     const { buyerEmail, items, totalAmount, paymentMethod } = req.body;
@@ -138,7 +148,7 @@ app.get('/', (req, res) => {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>KADEE.LK - Sri Lanka's Mega Marketplace | Daraz & Amazon Style</title>
+        <title>KADEE.LK - Sri Lanka's Mega Marketplace</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <style>
@@ -164,13 +174,11 @@ app.get('/', (req, res) => {
         <!-- Sticky Mega Header -->
         <header class="bg-orange-500 text-white shadow-lg sticky top-0 z-50">
             <div class="container mx-auto px-6 py-3 flex items-center justify-between gap-4">
-                <!-- Logo -->
                 <a href="/" class="text-3xl font-black tracking-wider flex items-center gap-2 drop-shadow">
                     <div class="bg-white text-orange-600 p-2 rounded-xl shadow"><i class="fa-solid fa-store"></i></div>
                     KADEE<span class="text-yellow-300">.LK</span>
                 </a>
                
-                <!-- Search Box -->
                 <div class="flex-1 max-w-3xl relative hidden md:block">
                     <input type="text" id="searchInput" placeholder="Search for products, brands and categories in KADEE.LK..." class="w-full py-3 px-5 rounded-l-xl text-gray-800 focus:outline-none shadow-inner font-medium">
                     <button onclick="searchProducts()" class="absolute right-0 top-0 bg-yellow-400 text-orange-950 px-8 py-3 rounded-r-xl font-extrabold hover:bg-yellow-300 transition shadow">
@@ -178,7 +186,6 @@ app.get('/', (req, res) => {
                     </button>
                 </div>
 
-                <!-- Right Action Buttons -->
                 <div class="flex items-center space-x-4">
                     <button id="adminDashboardBtn" onclick="openAdminModal()" class="hidden bg-purple-700 hover:bg-purple-800 text-white px-4 py-2 rounded-xl font-bold text-sm shadow transition flex items-center gap-2">
                         <i class="fa-solid fa-gauge-high"></i> Admin Panel
@@ -206,7 +213,7 @@ app.get('/', (req, res) => {
             </div>
         </nav>
 
-        <!-- Hero Banner Showcase (Daraz/Amazon style) -->
+        <!-- Hero Banner Showcase -->
         <div class="container mx-auto px-6 mt-6">
             <div class="bg-gradient-to-r from-gray-900 via-orange-900 to-orange-600 rounded-2xl p-8 md:p-12 text-white shadow-2xl flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
                 <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl">🛍️</div>
@@ -243,7 +250,7 @@ app.get('/', (req, res) => {
             </div>
         </main>
 
-        <!-- Auth Modal -->
+        <!-- Auth Modal (Dinidu Ravishka as example placeholder) -->
         <div id="authModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex justify-center items-center p-4">
             <div class="bg-white p-8 rounded-3xl w-full max-w-md shadow-2xl relative transform transition-all">
                 <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-black font-bold text-2xl">&times;</button>
@@ -251,7 +258,7 @@ app.get('/', (req, res) => {
                 <div id="registerFields" class="hidden space-y-4 mb-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Full Name</label>
-                        <input type="text" id="regName" placeholder="e.g. Nuwan Perera" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none">
+                        <input type="text" id="regName" placeholder="e.g. Dinidu Ravishka" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Account Role</label>
@@ -557,7 +564,7 @@ app.get('/', (req, res) => {
                                 <div>
                                     <h4 class="font-bold text-sm line-clamp-1">\${item.title}</h4>
                                     <span class="text-orange-600 font-extrabold text-xs">LKR \${item.price.toLocaleString()}</span>
-                                </div>
+                                }
                             </div>
                             <button onclick="removeFromCart(\${index})" class="text-red-500 hover:text-red-700 p-2"><i class="fa-solid fa-trash"></i></button>
                         </div>
@@ -606,25 +613,3 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 }); 
-// Seed initial products if database is empty
-async function seedProducts() {
-  try {
-    const count = await Product.countDocuments();
-    if (count === 0) {
-      await Product.insertMany([
-        { title: 'Wireless Bluetooth Gaming Headphones', price: 8500, category: 'Electronics', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500', rating: 4.8 },
-        { title: 'Smart Watch Series 8 Ultra', price: 15400, category: 'Electronics', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500', rating: 4.9 },
-        { title: 'Classic Casual Sports Sneakers', price: 5900, category: 'Fashion', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500', rating: 4.6 },
-        { title: 'Professional DSLR Camera 4K', price: 125000, category: 'Electronics', image: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500', rating: 5.0 },
-        { title: 'Minimalist Genuine Leather Wallet', price: 2500, category: 'Fashion', image: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=500', rating: 4.5 },
-        { title: 'Stainless Steel Insulated Water Bottle', price: 3200, category: 'Home & Living', image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=500', rating: 4.7 },
-        { title: 'Organic Glow Face Serum & Skincare', price: 4200, category: 'Beauty', image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=500', rating: 4.8 },
-        { title: 'Ergonomic Office Chair', price: 28500, category: 'Home & Living', image: 'https://images.unsplash.com/photo-1580481077494-e3299ac2510e?w=500', rating: 4.7 }
-      ]);
-      console.log('Initial products seeded successfully!');
-    }
-  } catch (err) {
-    console.error('Error seeding products:', err);
-  }
-}
-seedProducts();
