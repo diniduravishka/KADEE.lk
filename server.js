@@ -652,11 +652,4 @@ app.listen(PORT, () => {
                     document.getElementById('logoutBtn').classList.add('hidden');
                 }
             }
-<div id="registerFields" class="hidden space-y-4 mb-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-600 mb-1">Full Name</label>
-                        <input type="text" id="regName" placeholder="e.g. Dinidu Ravishka" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none">
-                    </div>
-                    <!-- මෙතන තිබුණු Account Role ඩ්‍රොප්ඩවුන් එක ඉවත් කර ඇත, එවිට හැමෝම Buyer කෙනෙක් ලෙස රෙජිස්ටර් වේ -->
-                    <input type="hidden" id="regRole" value="buyer">
-                </div> 
+
