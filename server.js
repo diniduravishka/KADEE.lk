@@ -15,7 +15,7 @@ if (MONGO_URI) {
   mongoose.connect(MONGO_URI)
     .then(() => {
       console.log('MongoDB Connected Successfully to KADEE.LK Mega Marketplace!');
-      seedProducts();
+      seedDatabase();
     })
     .catch((err) => console.error('MongoDB Connection Error:', err));
 } else {
@@ -54,9 +54,22 @@ const orderSchema = new mongoose.Schema({
 });
 const Order = mongoose.model('Order', orderSchema);
 
-// Auto-seed initial products
-async function seedProducts() {
+// Auto-seed initial products and default Admin account
+async function seedDatabase() {
   try {
+    // Seed Admin Account
+    const adminExists = await User.findOne({ role: 'admin' });
+    if (!adminExists) {
+      await User.create({
+        name: 'Dinidu ravishka',
+        email: 'diniduravishka649@gmail.com',
+        password: 'ACD172aus@kc',
+        role: 'admin'
+      });
+      console.log('Default Admin Account created successfully!');
+    }
+
+    // Seed Products
     const count = await Product.countDocuments();
     if (count === 0) {
       await Product.insertMany([
@@ -72,7 +85,7 @@ async function seedProducts() {
       console.log('Initial mega products seeded successfully!');
     }
   } catch (err) {
-    console.error('Error seeding products:', err);
+    console.error('Error in database seeding:', err);
   }
 }
 
@@ -80,10 +93,12 @@ async function seedProducts() {
 
 app.post('/api/register', async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password } = req.body;
     const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(400).json({ error: 'Email already registered!' });
-    const newUser = new User({ name, email, password, role });
+   
+    // Always force new signups to be 'buyer' for security
+    const newUser = new User({ name, email, password, role: 'buyer' });
     await newUser.save();
     res.json({ success: true, message: 'Registration successful!' });
   } catch (err) {
@@ -93,9 +108,12 @@ app.post('/api/register', async (req, res) => {
 
 app.post('/api/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email, password });
-    if (!user) return res.status(400).json({ error: 'Invalid email or password!' });
+    const { email, password } = req.body; // email field can accept username or email
+    const user = await User.findOne({
+      $or: [{ email: email }, { name: email }],
+      password
+    });
+    if (!user) return res.status(400).json({ error: 'Invalid username/email or password!' });
     res.json({ success: true, user });
   } catch (err) {
     res.status(500).json({ error: 'Login failed' });
@@ -259,24 +277,18 @@ app.get('/', (req, res) => {
             <div class="bg-white p-8 rounded-3xl w-full max-w-md shadow-2xl relative transform transition-all">
                 <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-black font-bold text-2xl">&times;</button>
                 <h3 id="authTitle" class="text-2xl font-black mb-6 text-gray-900">Login to KADEE.LK</h3>
+               
                 <div id="registerFields" class="hidden space-y-4 mb-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Full Name</label>
-                        <input type="text" id="regName" placeholder="e.g. Dinidu Ravishka" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-600 mb-1">Account Role</label>
-                        <select id="regRole" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none font-medium">
-                            <option value="buyer">Buyer (Customer)</option>
-                            <option value="seller">Seller (Vendor Hub)</option>
-                            <option value="admin">Admin (Manager)</option>
-                        </select>
+                        <input type="text" id="regName" placeholder="e.g. John Doe" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none">
                     </div>
                 </div>
+
                 <div class="space-y-4 mb-6">
                     <div>
-                        <label class="block text-xs font-bold text-gray-600 mb-1">Email Address</label>
-                        <input type="email" id="authEmail" placeholder="name@example.com" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none">
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Username / Email Address</label>
+                        <input type="text" id="authEmail" placeholder="Dinidu ravishka or name@example.com" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Password</label>
@@ -376,7 +388,6 @@ app.get('/', (req, res) => {
                 const adminBtn = document.getElementById('adminDashboardBtn');
                 const sellerBtn = document.getElementById('sellerDashboardBtn');
                
-                // Hide buttons by default securely
                 adminBtn.classList.add('hidden');
                 sellerBtn.classList.add('hidden');
 
@@ -463,15 +474,14 @@ app.get('/', (req, res) => {
             async function handleAuthSubmit() {
                 const email = document.getElementById('authEmail').value.trim();
                 const password = document.getElementById('authPassword').value.trim();
-                if (!email || !password) { alert('Please enter email and password!'); return; }
+                if (!email || !password) { alert('Please enter username/email and password!'); return; }
 
                 if (isRegisterMode) {
                     const name = document.getElementById('regName').value.trim();
-                    const role = document.getElementById('regRole').value;
                     const res = await fetch('/api/register', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name, email, password, role })
+                        body: JSON.stringify({ name, email, password })
                     });
                     const data = await res.json();
                     if (data.success) { alert('Registration successful! Please login.'); toggleAuthMode(); }
@@ -489,7 +499,8 @@ app.get('/', (req, res) => {
                         closeAuthModal();
                         updateUIState();
                         alert('Welcome back, ' + currentUser.name + '!');
-                    } else { alert(data.error || 'Login failed! Check your email and password.'); }
+                        window.location.reload();
+                    } else { alert(data.error || 'Login failed! Check your username/email and password.'); }
                 }
             }
 
@@ -501,7 +512,13 @@ app.get('/', (req, res) => {
                 window.location.reload();
             }
 
-            function openSellerModal() { document.getElementById('sellerModal').classList.toggle('hidden'); }
+            function openSellerModal() {
+                if (!currentUser || (currentUser.role !== 'seller' && currentUser.role !== 'admin')) {
+                    alert('Access Denied! Sellers only.');
+                    return;
+                }
+                document.getElementById('sellerModal').classList.toggle('hidden');
+            }
 
             async function addNewProduct() {
                 const title = document.getElementById('prodTitle').value;
@@ -524,6 +541,10 @@ app.get('/', (req, res) => {
             }
 
             async function openAdminModal() {
+                if (!currentUser || currentUser.role !== 'admin') {
+                    alert('Access Denied! Admins only.');
+                    return;
+                }
                 const modal = document.getElementById('adminModal');
                 modal.classList.toggle('hidden');
                 if (!modal.classList.contains('hidden')) {
@@ -626,30 +647,3 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 }); 
-            function updateUIState() {
-                const adminBtn = document.getElementById('adminDashboardBtn');
-                const sellerBtn = document.getElementById('sellerDashboardBtn');
-               
-                // මුලින්ම හැමෝටම බටන්ස් දෙකම සම්පූර්ණයෙන්ම සඟවන්න (Hide)
-                adminBtn.classList.add('hidden');
-                sellerBtn.classList.add('hidden');
-
-                if (currentUser) {
-                    document.getElementById('userDisplay').innerText = `👤 ${currentUser.name} (${currentUser.role})`;
-                    document.getElementById('authBtn').classList.add('hidden');
-                    document.getElementById('logoutBtn').classList.remove('hidden');
-
-                    // රෝල් එක අනුව පමණක් අදාළ බටන් පෙන්වීම
-                    if (currentUser.role === 'seller' || currentUser.role === 'admin') {
-                        sellerBtn.classList.remove('hidden');
-                    }
-                    if (currentUser.role === 'admin') {
-                        adminBtn.classList.remove('hidden');
-                    }
-                } else {
-                    document.getElementById('userDisplay').innerText = '';
-                    document.getElementById('authBtn').classList.remove('hidden');
-                    document.getElementById('logoutBtn').classList.add('hidden');
-                }
-            }
-
