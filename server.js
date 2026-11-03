@@ -323,7 +323,7 @@ app.get('/', (req, res) => {
 
                 <div class="space-y-4 mb-6">
                     <div>
-                        <label class="block text-xs font-bold text-gray-600 mb-1">Username / Email Address</label>
+                        <label class="block text-xs font-bold text-gray-600 mb-1" id="authLabelEmail">Username / Email Address</label>
                         <input type="text" id="authEmail" autocomplete="username" placeholder="Dinidu ravishka or Maheshi@example.com" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none">
                     </div>
                     <div>
@@ -510,6 +510,16 @@ app.get('/', (req, res) => {
                 document.getElementById('registerFields').classList.toggle('hidden');
                 document.getElementById('authSubmitBtn').innerText = isRegisterMode ? 'Register Now' : 'Login';
                 document.getElementById('authToggleText').innerText = isRegisterMode ? 'Already have an account?' : "Don't have an account?";
+               
+                // Dynamic Label and Placeholder change based on mode
+                if (isRegisterMode) {
+                    document.getElementById('authLabelEmail').innerText = 'Email Address';
+                    document.getElementById('authEmail').placeholder = 'Maheshi@example.com';
+                } else {
+                    document.getElementById('authLabelEmail').innerText = 'Username / Email Address';
+                    document.getElementById('authEmail').placeholder = 'Dinidu ravishka or Maheshi@example.com';
+                }
+
                 document.getElementById('authEmail').value = '';
                 document.getElementById('authPassword').value = '';
             }
@@ -517,7 +527,7 @@ app.get('/', (req, res) => {
             async function handleAuthSubmit() {
                 const email = document.getElementById('authEmail').value.trim();
                 const password = document.getElementById('authPassword').value.trim();
-                if (!email || !password) { alert('Please enter username/email and password!'); return; }
+                if (!email || !password) { alert('Please enter email/username and password!'); return; }
 
                 if (isRegisterMode) {
                     const name = document.getElementById('regName').value.trim();
@@ -544,7 +554,7 @@ app.get('/', (req, res) => {
                         updateUIState();
                         alert('Welcome back, ' + currentUser.name + '!');
                         window.location.reload();
-                    } else { alert(data.error || 'Login failed! Check your username/email and password.'); }
+                    } else { alert(data.error || 'Invalid username/email or password!'); }
                 }
             }
 
