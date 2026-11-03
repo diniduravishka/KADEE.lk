@@ -101,7 +101,6 @@ app.post('/api/register', async (req, res) => {
     const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(400).json({ error: 'Email already registered!' });
    
-    // Allow buyer or seller registration, but strictly block admin registration here
     const assignedRole = (role === 'seller') ? 'seller' : 'buyer';
     const newUser = new User({ name, email, password, role: assignedRole });
     await newUser.save();
@@ -113,7 +112,7 @@ app.post('/api/register', async (req, res) => {
 
 app.post('/api/login', async (req, res) => {
   try {
-    const { email, password } = req.body; // email field can accept username or email
+    const { email, password } = req.body;
     const user = await User.findOne({
       $or: [{ email: email }, { name: email }],
       password
@@ -207,7 +206,8 @@ app.get('/', (req, res) => {
                 </a>
                
                 <div class="flex-1 max-w-3xl relative hidden md:block">
-                    <input type="text" id="searchInput" placeholder="Search for products, brands and categories in KADEE.LK..." class="w-full py-3 px-5 rounded-l-xl text-gray-800 focus:outline-none shadow-inner font-medium">
+                    <!-- Search input with zero value to ensure it starts completely clean -->
+                    <input type="text" id="searchInput" value="" placeholder="Search for products, brands and categories in KADEE.LK..." class="w-full py-3 px-5 rounded-l-xl text-gray-800 focus:outline-none shadow-inner font-medium">
                     <button onclick="searchProducts()" class="absolute right-0 top-0 bg-yellow-400 text-orange-950 px-8 py-3 rounded-r-xl font-extrabold hover:bg-yellow-300 transition shadow">
                         <i class="fa-solid fa-search"></i>
                     </button>
@@ -304,7 +304,8 @@ app.get('/', (req, res) => {
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Password</label>
-                        <input type="password" id="authPassword" placeholder="••••••••" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none">
+                        <!-- Explicitly set type="password" to ensure dots are shown securely -->
+                        <input type="password" id="authPassword" value="" placeholder="••••••••" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none">
                     </div>
                 </div>
                 <button onclick="handleAuthSubmit()" id="authSubmitBtn" class="w-full bg-orange-600 text-white py-3 rounded-xl font-bold hover:bg-orange-700 transition shadow-lg">Login</button>
@@ -472,7 +473,13 @@ app.get('/', (req, res) => {
                 }
             }
 
-            function openAuthModal() { document.getElementById('authModal').classList.remove('hidden'); }
+            function openAuthModal() {
+                // Clear input fields when modal opens to prevent auto-fill issues
+                document.getElementById('authEmail').value = '';
+                document.getElementById('authPassword').value = '';
+                document.getElementById('authModal').classList.remove('hidden');
+            }
+           
             function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
            
             function toggleAuthMode() {
@@ -481,6 +488,8 @@ app.get('/', (req, res) => {
                 document.getElementById('registerFields').classList.toggle('hidden');
                 document.getElementById('authSubmitBtn').innerText = isRegisterMode ? 'Register Now' : 'Login';
                 document.getElementById('authToggleText').innerText = isRegisterMode ? 'Already have an account?' : "Don't have an account?";
+                document.getElementById('authEmail').value = '';
+                document.getElementById('authPassword').value = '';
             }
 
             async function handleAuthSubmit() {
