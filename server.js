@@ -54,20 +54,34 @@ const orderSchema = new mongoose.Schema({
 });
 const Order = mongoose.model('Order', orderSchema);
 
-// Auto-seed initial products and default Admin account
+// Auto-seed initial products and default Admin accounts securely
 async function seedDatabase() {
   try {
-    // Seed Admin Account
-    const adminExists = await User.findOne({ role: 'admin' });
-    if (!adminExists) {
-      await User.create({
+    // 1st Admin Account
+    await User.findOneAndUpdate(
+      { email: 'diniduravishka649@gmail.com' },
+      {
         name: 'Dinidu ravishka',
         email: 'diniduravishka649@gmail.com',
         password: 'ACD172aus@kc',
         role: 'admin'
-      });
-      console.log('Default Admin Account created successfully!');
-    }
+      },
+      { upsert: true, new: true }
+    );
+
+    // 2nd Admin Account
+    await User.findOneAndUpdate(
+      { email: 'Maheshi@example.com' },
+      {
+        name: 'Maheshi herath',
+        email: 'Maheshi@example.com',
+        password: 'PMD1512hmp#@qc',
+        role: 'admin'
+      },
+      { upsert: true, new: true }
+    );
+
+    console.log('Default Admin Accounts verified & updated successfully!');
 
     // Seed Extended Mega Products
     const count = await Product.countDocuments();
@@ -98,11 +112,16 @@ async function seedDatabase() {
 app.post('/api/register', async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: email.trim().toLowerCase() });
     if (existingUser) return res.status(400).json({ error: 'Email already registered!' });
    
     const assignedRole = (role === 'seller') ? 'seller' : 'buyer';
-    const newUser = new User({ name, email, password, role: assignedRole });
+    const newUser = new User({
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      password: password.trim(),
+      role: assignedRole
+    });
     await newUser.save();
     res.json({ success: true, message: 'Registration successful!' });
   } catch (err) {
@@ -112,11 +131,17 @@ app.post('/api/register', async (req, res) => {
 
 app.post('/api/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const loginInput = req.body.email ? req.body.email.trim() : '';
+    const passwordInput = req.body.password ? req.body.password.trim() : '';
+   
     const user = await User.findOne({
-      $or: [{ email: email }, { name: email }],
-      password
+      $or: [
+        { email: loginInput.toLowerCase() },
+        { name: loginInput }
+      ],
+      password: passwordInput
     });
+   
     if (!user) return res.status(400).json({ error: 'Invalid username/email or password!' });
     res.json({ success: true, user });
   } catch (err) {
@@ -206,8 +231,7 @@ app.get('/', (req, res) => {
                 </a>
                
                 <div class="flex-1 max-w-3xl relative hidden md:block">
-                    <!-- Search input with zero value to ensure it starts completely clean -->
-                    <input type="text" id="searchInput" value="" placeholder="Search for products, brands and categories in KADEE.LK..." class="w-full py-3 px-5 rounded-l-xl text-gray-800 focus:outline-none shadow-inner font-medium">
+                    <input type="search" id="searchInput" autocomplete="off" placeholder="Search for products, brands and categories in KADEE.LK..." class="w-full py-3 px-5 rounded-l-xl text-gray-800 focus:outline-none shadow-inner font-medium">
                     <button onclick="searchProducts()" class="absolute right-0 top-0 bg-yellow-400 text-orange-950 px-8 py-3 rounded-r-xl font-extrabold hover:bg-yellow-300 transition shadow">
                         <i class="fa-solid fa-search"></i>
                     </button>
@@ -286,7 +310,7 @@ app.get('/', (req, res) => {
                 <div id="registerFields" class="hidden space-y-4 mb-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Full Name</label>
-                        <input type="text" id="regName" placeholder="e.g. Dinidu ravishka" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none">
+                        <input type="text" id="regName" placeholder="Dinidu ravishka" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Account Role</label>
@@ -300,12 +324,11 @@ app.get('/', (req, res) => {
                 <div class="space-y-4 mb-6">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Username / Email Address</label>
-                        <input type="text" id="authEmail" placeholder="Dinidu ravishka or name@example.com" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none">
+                        <input type="text" id="authEmail" autocomplete="username" placeholder="Dinidu ravishka or Maheshi@example.com" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Password</label>
-                        <!-- Explicitly set type="password" to ensure dots are shown securely -->
-                        <input type="password" id="authPassword" value="" placeholder="••••••••" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none">
+                        <input type="password" id="authPassword" autocomplete="current-password" placeholder="••••••••" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none">
                     </div>
                 </div>
                 <button onclick="handleAuthSubmit()" id="authSubmitBtn" class="w-full bg-orange-600 text-white py-3 rounded-xl font-bold hover:bg-orange-700 transition shadow-lg">Login</button>
@@ -474,7 +497,6 @@ app.get('/', (req, res) => {
             }
 
             function openAuthModal() {
-                // Clear input fields when modal opens to prevent auto-fill issues
                 document.getElementById('authEmail').value = '';
                 document.getElementById('authPassword').value = '';
                 document.getElementById('authModal').classList.remove('hidden');
