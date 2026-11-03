@@ -69,7 +69,7 @@ async function seedDatabase() {
       console.log('Default Admin Account created successfully!');
     }
 
-    // Seed Products
+    // Seed Extended Mega Products
     const count = await Product.countDocuments();
     if (count === 0) {
       await Product.insertMany([
@@ -80,9 +80,13 @@ async function seedDatabase() {
         { title: 'Minimalist Genuine Leather Wallet', price: 2500, category: 'Fashion', image: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=500', rating: 4.5 },
         { title: 'Stainless Steel Insulated Water Bottle', price: 3200, category: 'Home & Living', image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=500', rating: 4.7 },
         { title: 'Organic Glow Face Serum & Skincare', price: 4200, category: 'Beauty', image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=500', rating: 4.8 },
-        { title: 'Ergonomic Office Chair', price: 28500, category: 'Home & Living', image: 'https://images.unsplash.com/photo-1580481077494-e3299ac2510e?w=500', rating: 4.7 }
+        { title: 'Ergonomic Office Chair', price: 28500, category: 'Home & Living', image: 'https://images.unsplash.com/photo-1580481077494-e3299ac2510e?w=500', rating: 4.7 },
+        { title: 'Apple MacBook Pro M2 Air', price: 345000, category: 'Electronics', image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500', rating: 4.9 },
+        { title: 'Designer Summer Printed Shirt', price: 3800, category: 'Fashion', image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500', rating: 4.4 },
+        { title: 'Modern LED Desk Lamp with USB Charger', price: 4500, category: 'Home & Living', image: 'https://images.unsplash.com/photo-1534073828943-f801091bb18c?w=500', rating: 4.6 },
+        { title: 'Professional Makeup Brush Set 12pcs', price: 3100, category: 'Beauty', image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=500', rating: 4.7 }
       ]);
-      console.log('Initial mega products seeded successfully!');
+      console.log('Extended initial mega products seeded successfully!');
     }
   } catch (err) {
     console.error('Error in database seeding:', err);
@@ -93,12 +97,13 @@ async function seedDatabase() {
 
 app.post('/api/register', async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
     const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(400).json({ error: 'Email already registered!' });
    
-    // Always force new signups to be 'buyer' for security
-    const newUser = new User({ name, email, password, role: 'buyer' });
+    // Allow buyer or seller registration, but strictly block admin registration here
+    const assignedRole = (role === 'seller') ? 'seller' : 'buyer';
+    const newUser = new User({ name, email, password, role: assignedRole });
     await newUser.save();
     res.json({ success: true, message: 'Registration successful!' });
   } catch (err) {
@@ -281,7 +286,14 @@ app.get('/', (req, res) => {
                 <div id="registerFields" class="hidden space-y-4 mb-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Full Name</label>
-                        <input type="text" id="regName" placeholder="e.g. John Doe" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none">
+                        <input type="text" id="regName" placeholder="e.g. Dinidu ravishka" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Account Role</label>
+                        <select id="regRole" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none font-medium">
+                            <option value="buyer">Buyer (Customer)</option>
+                            <option value="seller">Seller (Vendor Hub)</option>
+                        </select>
                     </div>
                 </div>
 
@@ -478,10 +490,11 @@ app.get('/', (req, res) => {
 
                 if (isRegisterMode) {
                     const name = document.getElementById('regName').value.trim();
+                    const role = document.getElementById('regRole').value;
                     const res = await fetch('/api/register', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name, email, password })
+                        body: JSON.stringify({ name, email, password, role })
                     });
                     const data = await res.json();
                     if (data.success) { alert('Registration successful! Please login.'); toggleAuthMode(); }
