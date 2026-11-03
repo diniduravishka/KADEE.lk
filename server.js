@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// MongoDB Connection with detailed logs
+// MongoDB Connection
 const MONGO_URI = process.env.MONGO_URI;
 
 if (MONGO_URI) {
@@ -87,8 +87,7 @@ app.post('/api/register', async (req, res) => {
     await newUser.save();
     res.json({ success: true, message: 'Registration successful!' });
   } catch (err) {
-    console.error('Register error:', err);
-    res.status(500).json({ error: 'Registration failed due to server error' });
+    res.status(500).json({ error: 'Registration failed' });
   }
 });
 
@@ -99,8 +98,7 @@ app.post('/api/login', async (req, res) => {
     if (!user) return res.status(400).json({ error: 'Invalid email or password!' });
     res.json({ success: true, user });
   } catch (err) {
-    console.error('Login error:', err);
-    res.status(500).json({ error: 'Login failed due to server error' });
+    res.status(500).json({ error: 'Login failed' });
   }
 });
 
@@ -109,7 +107,6 @@ app.get('/api/products', async (req, res) => {
     const products = await Product.find({});
     res.json(products);
   } catch (err) {
-    console.error('Fetch products error:', err);
     res.status(500).json({ error: 'Failed to fetch products' });
   }
 });
@@ -376,22 +373,28 @@ app.get('/', (req, res) => {
             let isRegisterMode = false;
 
             function updateUIState() {
+                const adminBtn = document.getElementById('adminDashboardBtn');
+                const sellerBtn = document.getElementById('sellerDashboardBtn');
+               
+                // Hide buttons by default securely
+                adminBtn.classList.add('hidden');
+                sellerBtn.classList.add('hidden');
+
                 if (currentUser) {
                     document.getElementById('userDisplay').innerText = \`👤 \${currentUser.name} (\${currentUser.role})\`;
                     document.getElementById('authBtn').classList.add('hidden');
                     document.getElementById('logoutBtn').classList.remove('hidden');
+
                     if (currentUser.role === 'seller' || currentUser.role === 'admin') {
-                        document.getElementById('sellerDashboardBtn').classList.remove('hidden');
+                        sellerBtn.classList.remove('hidden');
                     }
                     if (currentUser.role === 'admin') {
-                        document.getElementById('adminDashboardBtn').classList.remove('hidden');
+                        adminBtn.classList.remove('hidden');
                     }
                 } else {
                     document.getElementById('userDisplay').innerText = '';
                     document.getElementById('authBtn').classList.remove('hidden');
                     document.getElementById('logoutBtn').classList.add('hidden');
-                    document.getElementById('sellerDashboardBtn').classList.add('hidden');
-                    document.getElementById('adminDashboardBtn').classList.add('hidden');
                 }
             }
 
@@ -458,12 +461,12 @@ app.get('/', (req, res) => {
             }
 
             async function handleAuthSubmit() {
-                const email = document.getElementById('authEmail').value;
-                const password = document.getElementById('authPassword').value;
+                const email = document.getElementById('authEmail').value.trim();
+                const password = document.getElementById('authPassword').value.trim();
                 if (!email || !password) { alert('Please enter email and password!'); return; }
 
                 if (isRegisterMode) {
-                    const name = document.getElementById('regName').value;
+                    const name = document.getElementById('regName').value.trim();
                     const role = document.getElementById('regRole').value;
                     const res = await fetch('/api/register', {
                         method: 'POST',
@@ -495,6 +498,7 @@ app.get('/', (req, res) => {
                 localStorage.removeItem('kadee_user');
                 updateUIState();
                 alert('Logged out successfully.');
+                window.location.reload();
             }
 
             function openSellerModal() { document.getElementById('sellerModal').classList.toggle('hidden'); }
@@ -575,7 +579,7 @@ app.get('/', (req, res) => {
                                     <span class="text-orange-600 font-extrabold text-xs">LKR \${item.price.toLocaleString()}</span>
                                 </div>
                             </div>
-                            <button onclick="removeFromCart(\${index})" class="text-red-500 hover:text-red-700 p-2"><i class="fa-solid fa-trash"></i></button>
+                            <button onclick="removeFromCart(\--index)" class="text-red-500 hover:text-red-700 p-2"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     \`;
                 }).join('');
