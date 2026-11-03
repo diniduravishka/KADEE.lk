@@ -626,3 +626,29 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 }); 
+            function updateUIState() {
+                const adminBtn = document.getElementById('adminDashboardBtn');
+                const sellerBtn = document.getElementById('sellerDashboardBtn');
+               
+                // මුලින්ම හැමෝටම බටන්ස් දෙකම සම්පූර්ණයෙන්ම සඟවන්න (Hide)
+                adminBtn.classList.add('hidden');
+                sellerBtn.classList.add('hidden');
+
+                if (currentUser) {
+                    document.getElementById('userDisplay').innerText = `👤 ${currentUser.name} (${currentUser.role})`;
+                    document.getElementById('authBtn').classList.add('hidden');
+                    document.getElementById('logoutBtn').classList.remove('hidden');
+
+                    // රෝල් එක අනුව පමණක් අදාළ බටන් පෙන්වීම
+                    if (currentUser.role === 'seller' || currentUser.role === 'admin') {
+                        sellerBtn.classList.remove('hidden');
+                    }
+                    if (currentUser.role === 'admin') {
+                        adminBtn.classList.remove('hidden');
+                    }
+                } else {
+                    document.getElementById('userDisplay').innerText = '';
+                    document.getElementById('authBtn').classList.remove('hidden');
+                    document.getElementById('logoutBtn').classList.add('hidden');
+                }
+            }
