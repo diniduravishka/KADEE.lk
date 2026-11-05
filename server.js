@@ -27,7 +27,8 @@ const userSchema = new mongoose.Schema({
   name: String,
   email: { type: String, unique: true },
   password: String,
-  role: { type: String, enum: ['buyer', 'seller', 'admin'], default: 'buyer' }
+  role: { type: String, enum: ['buyer', 'seller', 'admin'], default: 'buyer' },
+  date: { type: Date, default: Date.now }
 });
 const User = mongoose.model('User', userSchema);
 
@@ -60,11 +61,11 @@ async function seedDatabase() {
     // 1st Admin Account
     await User.findOneAndUpdate(
       { email: 'diniduravishka649@gmail.com' },
-      { 
-        name: 'Dinidu ravishka', 
-        email: 'diniduravishka649@gmail.com', 
-        password: 'ACD172aus@kc', 
-        role: 'admin' 
+      {
+        name: 'Dinidu ravishka',
+        email: 'diniduravishka649@gmail.com',
+        password: 'ACD172aus@kc',
+        role: 'admin'
       },
       { upsert: true, new: true }
     );
@@ -72,11 +73,11 @@ async function seedDatabase() {
     // 2nd Admin Account
     await User.findOneAndUpdate(
       { email: 'Maheshi@example.com' },
-      { 
-        name: 'Maheshi herath', 
-        email: 'Maheshi@example.com', 
-        password: 'PMD1512hmp#@qc', 
-        role: 'admin' 
+      {
+        name: 'Maheshi herath',
+        email: 'Maheshi@example.com',
+        password: 'PMD1512hmp#@qc',
+        role: 'admin'
       },
       { upsert: true, new: true }
     );
@@ -87,18 +88,18 @@ async function seedDatabase() {
     const count = await Product.countDocuments();
     if (count === 0) {
       await Product.insertMany([
-        { title: 'Wireless Bluetooth Gaming Headphones', price: 8500, category: 'Electronics', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500', rating: 4.8 },
-        { title: 'Smart Watch Series 8 Ultra', price: 15400, category: 'Electronics', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500', rating: 4.9 },
-        { title: 'Classic Casual Sports Sneakers', price: 5900, category: 'Fashion', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500', rating: 4.6 },
-        { title: 'Professional DSLR Camera 4K', price: 125000, category: 'Electronics', image: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500', rating: 5.0 },
-        { title: 'Minimalist Genuine Leather Wallet', price: 2500, category: 'Fashion', image: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=500', rating: 4.5 },
-        { title: 'Stainless Steel Insulated Water Bottle', price: 3200, category: 'Home & Living', image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=500', rating: 4.7 },
-        { title: 'Organic Glow Face Serum & Skincare', price: 4200, category: 'Beauty', image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=500', rating: 4.8 },
-        { title: 'Ergonomic Office Chair', price: 28500, category: 'Home & Living', image: 'https://images.unsplash.com/photo-1580481077494-e3299ac2510e?w=500', rating: 4.7 },
-        { title: 'Apple MacBook Pro M2 Air', price: 345000, category: 'Electronics', image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500', rating: 4.9 },
-        { title: 'Designer Summer Printed Shirt', price: 3800, category: 'Fashion', image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500', rating: 4.4 },
-        { title: 'Modern LED Desk Lamp with USB Charger', price: 4500, category: 'Home & Living', image: 'https://images.unsplash.com/photo-1534073828943-f801091bb18c?w=500', rating: 4.6 },
-        { title: 'Professional Makeup Brush Set 12pcs', price: 3100, category: 'Beauty', image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=500', rating: 4.7 }
+        { title: 'Wireless Bluetooth Gaming Headphones', price: 8500, category: 'Electronics', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500', sellerEmail: 'diniduravishka649@gmail.com', rating: 4.8 },
+        { title: 'Smart Watch Series 8 Ultra', price: 15400, category: 'Electronics', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500', sellerEmail: 'diniduravishka649@gmail.com', rating: 4.9 },
+        { title: 'Classic Casual Sports Sneakers', price: 5900, category: 'Fashion', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500', sellerEmail: 'Maheshi@example.com', rating: 4.6 },
+        { title: 'Professional DSLR Camera 4K', price: 125000, category: 'Electronics', image: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500', sellerEmail: 'diniduravishka649@gmail.com', rating: 5.0 },
+        { title: 'Minimalist Genuine Leather Wallet', price: 2500, category: 'Fashion', image: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=500', sellerEmail: 'Maheshi@example.com', rating: 4.5 },
+        { title: 'Stainless Steel Insulated Water Bottle', price: 3200, category: 'Home & Living', image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=500', sellerEmail: 'diniduravishka649@gmail.com', rating: 4.7 },
+        { title: 'Organic Glow Face Serum & Skincare', price: 4200, category: 'Beauty', image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=500', sellerEmail: 'Maheshi@example.com', rating: 4.8 },
+        { title: 'Ergonomic Office Chair', price: 28500, category: 'Home & Living', image: 'https://images.unsplash.com/photo-1580481077494-e3299ac2510e?w=500', sellerEmail: 'diniduravishka649@gmail.com', rating: 4.7 },
+        { title: 'Apple MacBook Pro M2 Air', price: 345000, category: 'Electronics', image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500', sellerEmail: 'diniduravishka649@gmail.com', rating: 4.9 },
+        { title: 'Designer Summer Printed Shirt', price: 3800, category: 'Fashion', image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500', sellerEmail: 'Maheshi@example.com', rating: 4.4 },
+        { title: 'Modern LED Desk Lamp with USB Charger', price: 4500, category: 'Home & Living', image: 'https://images.unsplash.com/photo-1534073828943-f801091bb18c?w=500', sellerEmail: 'diniduravishka649@gmail.com', rating: 4.6 },
+        { title: 'Professional Makeup Brush Set 12pcs', price: 3100, category: 'Beauty', image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=500', sellerEmail: 'Maheshi@example.com', rating: 4.7 }
       ]);
       console.log('Extended initial mega products seeded successfully!');
     }
@@ -114,13 +115,13 @@ app.post('/api/register', async (req, res) => {
     const { name, email, password, role } = req.body;
     const existingUser = await User.findOne({ email: email.trim().toLowerCase() });
     if (existingUser) return res.status(400).json({ error: 'Email already registered!' });
-    
+   
     const assignedRole = (role === 'seller') ? 'seller' : 'buyer';
-    const newUser = new User({ 
-      name: name.trim(), 
-      email: email.trim().toLowerCase(), 
-      password: password.trim(), 
-      role: assignedRole 
+    const newUser = new User({
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      password: password.trim(),
+      role: assignedRole
     });
     await newUser.save();
     res.json({ success: true, message: 'Registration successful!' });
@@ -133,15 +134,15 @@ app.post('/api/login', async (req, res) => {
   try {
     const loginInput = req.body.email ? req.body.email.trim() : '';
     const passwordInput = req.body.password ? req.body.password.trim() : '';
-    
-    const user = await User.findOne({ 
+   
+    const user = await User.findOne({
       $or: [
-        { email: loginInput.toLowerCase() }, 
+        { email: loginInput.toLowerCase() },
         { name: loginInput }
-      ], 
-      password: passwordInput 
+      ],
+      password: passwordInput
     });
-    
+   
     if (!user) return res.status(400).json({ error: 'Invalid username/email or password!' });
     res.json({ success: true, user });
   } catch (err) {
@@ -182,10 +183,23 @@ app.post('/api/checkout', async (req, res) => {
 
 app.get('/api/admin/stats', async (req, res) => {
   try {
-    const userCount = await User.countDocuments();
-    const productCount = await Product.countDocuments();
+    const totalUsers = await User.countDocuments();
+    const buyerCount = await User.countDocuments({ role: 'buyer' });
+    const sellerCount = await User.countDocuments({ role: 'seller' });
+    const adminCount = await User.countDocuments({ role: 'admin' });
+   
+    const products = await Product.find({});
     const orders = await Order.find({});
-    res.json({ userCount, productCount, orders });
+
+    res.json({
+      totalUsers,
+      buyerCount,
+      sellerCount,
+      adminCount,
+      productCount: products.length,
+      products,
+      orders
+    });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch stats' });
   }
@@ -229,7 +243,7 @@ app.get('/', (req, res) => {
                     <div class="bg-white text-orange-600 p-2 rounded-xl shadow"><i class="fa-solid fa-store"></i></div>
                     KADEE<span class="text-yellow-300">.LK</span>
                 </a>
-                
+               
                 <div class="flex-1 max-w-3xl relative hidden md:block">
                     <input type="search" id="searchInput" autocomplete="off" placeholder="Search for products, brands and categories in KADEE.LK..." class="w-full py-3 px-5 rounded-l-xl text-gray-800 focus:outline-none shadow-inner font-medium">
                     <button onclick="searchProducts()" class="absolute right-0 top-0 bg-yellow-400 text-orange-950 px-8 py-3 rounded-r-xl font-extrabold hover:bg-yellow-300 transition shadow">
@@ -289,13 +303,31 @@ app.get('/', (req, res) => {
             </div>
         </div>
 
+        <!-- Dynamic Marketplace Info Banner for Logged Users -->
+        <div id="roleInfoBanner" class="container mx-auto px-6 mt-6 hidden">
+            <div id="buyerBanner" class="hidden bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-6 rounded-2xl shadow-lg flex items-center justify-between">
+                <div>
+                    <h3 class="text-xl font-black flex items-center gap-2"><i class="fa-solid fa-bag-shopping"></i> Welcome to Your Buyer Hub!</h3>
+                    <p class="text-sm text-blue-100 mt-1">Enjoy lightning-fast islandwide delivery, verified local sellers, secure PayHere payments, and 24/7 buyer protection on KADEE.LK.</p>
+                </div>
+                <span class="bg-yellow-400 text-blue-950 px-4 py-2 rounded-xl font-extrabold text-sm shadow">VIP Buyer</span>
+            </div>
+            <div id="sellerBanner" class="hidden bg-gradient-to-r from-amber-600 to-orange-700 text-white p-6 rounded-2xl shadow-lg flex items-center justify-between">
+                <div>
+                    <h3 class="text-xl font-black flex items-center gap-2"><i class="fa-solid fa-store"></i> Welcome to Seller Hub & Vendor Dashboard!</h3>
+                    <p class="text-sm text-amber-100 mt-1">Manage your inventory, publish trending products instantly to thousands of Sri Lankan buyers, and track your sales performance in real-time.</p>
+                </div>
+                <button onclick="openSellerModal()" class="bg-white text-orange-950 px-4 py-2 rounded-xl font-extrabold text-sm shadow hover:bg-yellow-300 transition">Publish Product</button>
+            </div>
+        </div>
+
         <!-- Main Product Grid -->
         <main class="container mx-auto px-6 my-10">
             <div class="flex justify-between items-center mb-6 border-b pb-3">
                 <h2 class="text-2xl font-black text-gray-900 flex items-center gap-2"><i class="fa-solid fa-bolt text-orange-500"></i> Flash Sale & Trending Items</h2>
                 <span class="text-sm font-semibold text-gray-500">Showing curated mega collection</span>
             </div>
-            
+           
             <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 <div class="text-center col-span-full py-16 text-gray-400 font-medium">Loading mega marketplace...</div>
             </div>
@@ -306,7 +338,7 @@ app.get('/', (req, res) => {
             <div class="bg-white p-8 rounded-3xl w-full max-w-md shadow-2xl relative transform transition-all">
                 <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-black font-bold text-2xl">&times;</button>
                 <h3 id="authTitle" class="text-2xl font-black mb-6 text-gray-900">Login to KADEE.LK</h3>
-                
+               
                 <div id="registerFields" class="hidden space-y-4 mb-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Full Name</label>
@@ -324,7 +356,7 @@ app.get('/', (req, res) => {
                 <div class="space-y-4 mb-6">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1" id="authLabelEmail">Username / Email Address</label>
-                        <input type="text" id="authEmail" autocomplete="username" placeholder="Dinidu ravishka or Maheshi@example.com" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none">
+                        <input type="text" id="authEmail" autocomplete="username" placeholder="Dinidu ravishka" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Password</label>
@@ -333,7 +365,7 @@ app.get('/', (req, res) => {
                 </div>
                 <button onclick="handleAuthSubmit()" id="authSubmitBtn" class="w-full bg-orange-600 text-white py-3 rounded-xl font-bold hover:bg-orange-700 transition shadow-lg">Login</button>
                 <p class="text-sm text-center mt-6 text-gray-600">
-                    <span id="authToggleText">Don't have an account?</span> 
+                    <span id="authToggleText">Don't have an account?</span>
                     <button onclick="toggleAuthMode()" class="text-orange-600 font-extrabold underline ml-1">Register here</button>
                 </p>
             </div>
@@ -368,21 +400,64 @@ app.get('/', (req, res) => {
 
         <!-- Admin Dashboard Modal -->
         <div id="adminModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex justify-center items-center p-4">
-            <div class="bg-white p-8 rounded-3xl w-full max-w-3xl max-h-[85vh] overflow-y-auto shadow-2xl relative">
+            <div class="bg-white p-8 rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl relative">
                 <button onclick="openAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-black font-bold text-2xl">&times;</button>
-                <h3 class="text-2xl font-black mb-6 text-purple-700 flex items-center gap-2"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <div class="bg-purple-50 p-6 rounded-2xl border border-purple-100 text-center">
-                        <h4 class="text-gray-600 font-semibold text-sm">Total Registered Users</h4>
-                        <p id="adminUserCount" class="text-4xl font-black text-purple-700 mt-2">0</p>
+                <h3 class="text-2xl font-black mb-6 text-purple-700 flex items-center gap-2"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard & Analytics</h3>
+               
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-purple-50 p-4 rounded-2xl border border-purple-100 text-center">
+                        <h4 class="text-gray-600 font-semibold text-xs uppercase">Total Users</h4>
+                        <p id="adminTotalUsers" class="text-3xl font-black text-purple-700 mt-1">0</p>
                     </div>
-                    <div class="bg-orange-50 p-6 rounded-2xl border border-orange-100 text-center">
-                        <h4 class="text-gray-600 font-semibold text-sm">Total Active Products</h4>
-                        <p id="adminProdCount" class="text-4xl font-black text-orange-600 mt-2">0</p>
+                    <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100 text-center">
+                        <h4 class="text-gray-600 font-semibold text-xs uppercase">Total Buyers</h4>
+                        <p id="adminBuyerCount" class="text-3xl font-black text-blue-700 mt-1">0</p>
+                    </div>
+                    <div class="bg-amber-50 p-4 rounded-2xl border border-amber-100 text-center">
+                        <h4 class="text-gray-600 font-semibold text-xs uppercase">Total Sellers</h4>
+                        <p id="adminSellerCount" class="text-3xl font-black text-amber-600 mt-1">0</p>
+                    </div>
+                    <div class="bg-orange-50 p-4 rounded-2xl border border-orange-100 text-center">
+                        <h4 class="text-gray-600 font-semibold text-xs uppercase">Total Products</h4>
+                        <p id="adminProdCount" class="text-3xl font-black text-orange-600 mt-1">0</p>
                     </div>
                 </div>
-                <h4 class="font-bold text-lg mb-4 text-gray-900">Recent Customer Orders (PayHere & COD)</h4>
-                <div id="adminOrdersList" class="space-y-3 text-sm">
+
+                <!-- Growth Analytics Charts Section -->
+                <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 mb-8">
+                    <h4 class="font-bold text-base mb-4 text-gray-900 flex items-center gap-2"><i class="fa-solid fa-chart-line text-purple-600"></i> Marketplace Growth & Registration Analytics</h4>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-xs font-bold text-gray-600 mb-1">
+                                <span>Buyers Registration Ratio</span>
+                                <span id="buyerRatioText">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                                <div id="buyerProgressBar" class="bg-blue-600 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs font-bold text-gray-600 mb-1">
+                                <span>Sellers Registration Ratio</span>
+                                <span id="sellerRatioText">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                                <div id="sellerProgressBar" class="bg-amber-500 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Products List with Seller Names -->
+                <h4 class="font-bold text-lg mb-3 text-gray-900 flex items-center gap-2"><i class="fa-solid fa-boxes-stacked text-orange-600"></i> Active Products & Seller Details</h4>
+                <div id="adminProductsList" class="space-y-3 mb-8 max-h-60 overflow-y-auto pr-2">
+                    <p class="text-gray-400">Loading products...</p>
+                </div>
+
+                <!-- Recent Customer Orders -->
+                <h4 class="font-bold text-lg mb-3 text-gray-900 flex items-center gap-2"><i class="fa-solid fa-receipt text-green-600"></i> Recent Customer Orders (PayHere & COD)</h4>
+                <div id="adminOrdersList" class="space-y-3 text-sm max-h-60 overflow-y-auto pr-2">
                     <p class="text-gray-400">Loading orders...</p>
                 </div>
             </div>
@@ -423,17 +498,27 @@ app.get('/', (req, res) => {
             function updateUIState() {
                 const adminBtn = document.getElementById('adminDashboardBtn');
                 const sellerBtn = document.getElementById('sellerDashboardBtn');
-                
+                const roleBanner = document.getElementById('roleInfoBanner');
+                const buyerBanner = document.getElementById('buyerBanner');
+                const sellerBanner = document.getElementById('sellerBanner');
+               
                 adminBtn.classList.add('hidden');
                 sellerBtn.classList.add('hidden');
+                roleBanner.classList.add('hidden');
+                buyerBanner.classList.add('hidden');
+                sellerBanner.classList.add('hidden');
 
                 if (currentUser) {
                     document.getElementById('userDisplay').innerText = \`👤 \${currentUser.name} (\${currentUser.role})\`;
                     document.getElementById('authBtn').classList.add('hidden');
                     document.getElementById('logoutBtn').classList.remove('hidden');
 
-                    if (currentUser.role === 'seller' || currentUser.role === 'admin') {
+                    roleBanner.classList.remove('hidden');
+                    if (currentUser.role === 'buyer') {
+                        buyerBanner.classList.remove('hidden');
+                    } else if (currentUser.role === 'seller' || currentUser.role === 'admin') {
                         sellerBtn.classList.remove('hidden');
+                        sellerBanner.classList.remove('hidden');
                     }
                     if (currentUser.role === 'admin') {
                         adminBtn.classList.remove('hidden');
@@ -496,28 +581,27 @@ app.get('/', (req, res) => {
                 }
             }
 
-            function openAuthModal() { 
+            function openAuthModal() {
                 document.getElementById('authEmail').value = '';
                 document.getElementById('authPassword').value = '';
-                document.getElementById('authModal').classList.remove('hidden'); 
+                document.getElementById('authModal').classList.remove('hidden');
             }
-            
+           
             function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
-            
+           
             function toggleAuthMode() {
                 isRegisterMode = !isRegisterMode;
                 document.getElementById('authTitle').innerText = isRegisterMode ? 'Create KADEE.LK Account' : 'Login to KADEE.LK';
                 document.getElementById('registerFields').classList.toggle('hidden');
                 document.getElementById('authSubmitBtn').innerText = isRegisterMode ? 'Register Now' : 'Login';
                 document.getElementById('authToggleText').innerText = isRegisterMode ? 'Already have an account?' : "Don't have an account?";
-                
-                // Dynamic Label and Placeholder change based on mode
+               
                 if (isRegisterMode) {
                     document.getElementById('authLabelEmail').innerText = 'Email Address';
                     document.getElementById('authEmail').placeholder = 'Maheshi@example.com';
                 } else {
                     document.getElementById('authLabelEmail').innerText = 'Username / Email Address';
-                    document.getElementById('authEmail').placeholder = 'Dinidu ravishka or Maheshi@example.com';
+                    document.getElementById('authEmail').placeholder = 'Dinidu ravishka';
                 }
 
                 document.getElementById('authEmail').value = '';
@@ -527,7 +611,7 @@ app.get('/', (req, res) => {
             async function handleAuthSubmit() {
                 const email = document.getElementById('authEmail').value.trim();
                 const password = document.getElementById('authPassword').value.trim();
-                if (!email || !password) { alert('Please enter email/username and password!'); return; }
+                if (!email || !password) { alert('Please enter username/email and password!'); return; }
 
                 if (isRegisterMode) {
                     const name = document.getElementById('regName').value.trim();
@@ -566,12 +650,12 @@ app.get('/', (req, res) => {
                 window.location.reload();
             }
 
-            function openSellerModal() { 
+            function openSellerModal() {
                 if (!currentUser || (currentUser.role !== 'seller' && currentUser.role !== 'admin')) {
                     alert('Access Denied! Sellers only.');
                     return;
                 }
-                document.getElementById('sellerModal').classList.toggle('hidden'); 
+                document.getElementById('sellerModal').classList.toggle('hidden');
             }
 
             async function addNewProduct() {
@@ -580,7 +664,7 @@ app.get('/', (req, res) => {
                 const category = document.getElementById('prodCategory').value;
                 const image = document.getElementById('prodImage').value;
                 if (!title || !price || !category || !image) { alert('Please fill in all product details!'); return; }
-                
+               
                 const res = await fetch('/api/products', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -604,8 +688,43 @@ app.get('/', (req, res) => {
                 if (!modal.classList.contains('hidden')) {
                     const res = await fetch('/api/admin/stats');
                     const stats = await res.json();
-                    document.getElementById('adminUserCount').innerText = stats.userCount;
+                   
+                    document.getElementById('adminTotalUsers').innerText = stats.totalUsers;
+                    document.getElementById('adminBuyerCount').innerText = stats.buyerCount;
+                    document.getElementById('adminSellerCount').innerText = stats.sellerCount;
                     document.getElementById('adminProdCount').innerText = stats.productCount;
+
+                    // Calculate Ratios for Growth Analytics Charts
+                    const totalRegs = stats.buyerCount + stats.sellerCount;
+                    const buyerPct = totalRegs > 0 ? Math.round((stats.buyerCount / totalRegs) * 100) : 0;
+                    const sellerPct = totalRegs > 0 ? Math.round((stats.sellerCount / totalRegs) * 100) : 0;
+
+                    document.getElementById('buyerRatioText').innerText = buyerPct + '% (' + stats.buyerCount + ' Buyers)';
+                    document.getElementById('buyerProgressBar').style.width = buyerPct + '%';
+
+                    document.getElementById('sellerRatioText').innerText = sellerPct + '% (' + stats.sellerCount + ' Sellers)';
+                    document.getElementById('sellerProgressBar').style.width = sellerPct + '%';
+
+                    // Active Products with Seller Names
+                    const prodList = document.getElementById('adminProductsList');
+                    if (stats.products.length === 0) {
+                        prodList.innerHTML = '<p class="text-gray-400">No active products found.</p>';
+                    } else {
+                        prodList.innerHTML = stats.products.map(p => \`
+                            <div class="bg-gray-50 p-3 rounded-xl border flex justify-between items-center text-sm shadow-sm">
+                                <div class="flex items-center gap-3">
+                                    <img src="\${p.image}" class="w-10 h-10 object-cover rounded-lg">
+                                    <div>
+                                        <h5 class="font-bold text-gray-900">\${p.title}</h5>
+                                        <span class="text-xs text-gray-500">Seller: <b class="text-orange-600">\${p.sellerEmail || 'Admin/System'}</b></span>
+                                    </div>
+                                </div>
+                                <span class="font-black text-orange-600">LKR \${p.price.toLocaleString()}</span>
+                            </div>
+                        \`).join('');
+                    }
+
+                    // Orders List
                     const ordersList = document.getElementById('adminOrdersList');
                     if (stats.orders.length === 0) {
                         ordersList.innerHTML = '<p class="text-gray-400">No orders received yet.</p>';
@@ -613,7 +732,7 @@ app.get('/', (req, res) => {
                         ordersList.innerHTML = stats.orders.map(o => \`
                             <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex justify-between items-center shadow-sm">
                                 <div>
-                                    <span class="font-black text-xs text-purple-700">\${o.buyerEmail}</span>
+                                    <span class="font-black text-xs text-purple-700">Buyer: \${o.buyerEmail}</span>
                                     <p class="text-xs text-gray-600 mt-0.5">Total: <b>LKR \${o.totalAmount.toLocaleString()}</b> via \${o.paymentMethod}</p>
                                 </div>
                                 <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-extrabold">\${o.status}</span>
@@ -700,5 +819,4 @@ app.get('/', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-});
-
+}); 
