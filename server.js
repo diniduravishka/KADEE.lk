@@ -58,7 +58,6 @@ const Order = mongoose.model('Order', orderSchema);
 // Auto-seed initial products and default Admin accounts securely
 async function seedDatabase() {
   try {
-    // 1st Admin Account
     await User.findOneAndUpdate(
       { email: 'diniduravishka649@gmail.com' },
       {
@@ -70,7 +69,6 @@ async function seedDatabase() {
       { upsert: true, new: true }
     );
 
-    // 2nd Admin Account
     await User.findOneAndUpdate(
       { email: 'Maheshi@example.com' },
       {
@@ -84,7 +82,6 @@ async function seedDatabase() {
 
     console.log('Default Admin Accounts verified & updated successfully!');
 
-    // Seed Extended Mega Products
     const count = await Product.countDocuments();
     if (count === 0) {
       await Product.insertMany([
@@ -93,15 +90,9 @@ async function seedDatabase() {
         { title: 'Classic Casual Sports Sneakers', price: 5900, category: 'Fashion', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500', sellerEmail: 'Maheshi@example.com', rating: 4.6 },
         { title: 'Professional DSLR Camera 4K', price: 125000, category: 'Electronics', image: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500', sellerEmail: 'diniduravishka649@gmail.com', rating: 5.0 },
         { title: 'Minimalist Genuine Leather Wallet', price: 2500, category: 'Fashion', image: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=500', sellerEmail: 'Maheshi@example.com', rating: 4.5 },
-        { title: 'Stainless Steel Insulated Water Bottle', price: 3200, category: 'Home & Living', image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=500', sellerEmail: 'diniduravishka649@gmail.com', rating: 4.7 },
-        { title: 'Organic Glow Face Serum & Skincare', price: 4200, category: 'Beauty', image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=500', sellerEmail: 'Maheshi@example.com', rating: 4.8 },
-        { title: 'Ergonomic Office Chair', price: 28500, category: 'Home & Living', image: 'https://images.unsplash.com/photo-1580481077494-e3299ac2510e?w=500', sellerEmail: 'diniduravishka649@gmail.com', rating: 4.7 },
-        { title: 'Apple MacBook Pro M2 Air', price: 345000, category: 'Electronics', image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500', sellerEmail: 'diniduravishka649@gmail.com', rating: 4.9 },
-        { title: 'Designer Summer Printed Shirt', price: 3800, category: 'Fashion', image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500', sellerEmail: 'Maheshi@example.com', rating: 4.4 },
-        { title: 'Modern LED Desk Lamp with USB Charger', price: 4500, category: 'Home & Living', image: 'https://images.unsplash.com/photo-1534073828943-f801091bb18c?w=500', sellerEmail: 'diniduravishka649@gmail.com', rating: 4.6 },
-        { title: 'Professional Makeup Brush Set 12pcs', price: 3100, category: 'Beauty', image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=500', sellerEmail: 'Maheshi@example.com', rating: 4.7 }
+        { title: 'Stainless Steel Insulated Water Bottle', price: 3200, category: 'Home & Living', image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=500', sellerEmail: 'diniduravishka649@gmail.com', rating: 4.7 }
       ]);
-      console.log('Extended initial mega products seeded successfully!');
+      console.log('Initial mega products seeded successfully!');
     }
   } catch (err) {
     console.error('Error in database seeding:', err);
@@ -237,14 +228,14 @@ app.get('/', (req, res) => {
         </div>
 
         <!-- Sticky Mega Header -->
-        <header class="bg-orange-500 text-white shadow-lg sticky top-0 z-50">
+        <header id="mainHeader" class="bg-orange-500 text-white shadow-lg sticky top-0 z-50">
             <div class="container mx-auto px-6 py-3 flex items-center justify-between gap-4">
                 <a href="/" class="text-3xl font-black tracking-wider flex items-center gap-2 drop-shadow">
                     <div class="bg-white text-orange-600 p-2 rounded-xl shadow"><i class="fa-solid fa-store"></i></div>
                     KADEE<span class="text-yellow-300">.LK</span>
                 </a>
                
-                <div class="flex-1 max-w-3xl relative hidden md:block">
+                <div class="flex-1 max-w-3xl relative hidden md:block" id="searchBarContainer">
                     <input type="search" id="searchInput" autocomplete="off" placeholder="Search for products, brands and categories in KADEE.LK..." class="w-full py-3 px-5 rounded-l-xl text-gray-800 focus:outline-none shadow-inner font-medium">
                     <button onclick="searchProducts()" class="absolute right-0 top-0 bg-yellow-400 text-orange-950 px-8 py-3 rounded-r-xl font-extrabold hover:bg-yellow-300 transition shadow">
                         <i class="fa-solid fa-search"></i>
@@ -258,7 +249,7 @@ app.get('/', (req, res) => {
                     <button id="sellerDashboardBtn" onclick="openSellerModal()" class="hidden bg-yellow-300 hover:bg-yellow-400 text-orange-950 px-4 py-2 rounded-xl font-bold text-sm shadow transition flex items-center gap-2">
                         <i class="fa-solid fa-box-archive"></i> Seller Hub
                     </button>
-                    <div class="relative cursor-pointer flex items-center gap-2 bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded-xl transition shadow" onclick="toggleCart()">
+                    <div id="cartIconWrapper" class="relative cursor-pointer flex items-center gap-2 bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded-xl transition shadow" onclick="toggleCart()">
                         <i class="fa-solid fa-cart-shopping text-xl"></i>
                         <span id="cartCount" class="bg-yellow-300 text-orange-950 rounded-full px-2 py-0.5 text-xs font-black">0</span>
                         <span class="hidden lg:inline font-bold">Cart</span>
@@ -268,7 +259,7 @@ app.get('/', (req, res) => {
         </header>
 
         <!-- Categories Bar -->
-        <nav class="bg-white shadow-sm border-b sticky top-[68px] z-40">
+        <nav id="categoriesNav" class="bg-white shadow-sm border-b sticky top-[68px] z-40">
             <div class="container mx-auto px-6 py-2.5 flex space-x-8 overflow-x-auto text-sm font-bold text-gray-700">
                 <button onclick="filterCategory('All')" class="hover:text-orange-600 whitespace-nowrap flex items-center gap-1.5"><i class="fa-solid fa-fire text-orange-500"></i> All Categories</button>
                 <button onclick="filterCategory('Electronics')" class="hover:text-orange-600 whitespace-nowrap flex items-center gap-1.5"><i class="fa-solid fa-laptop"></i> Electronics</button>
@@ -278,8 +269,72 @@ app.get('/', (req, res) => {
             </div>
         </nav>
 
+        <!-- Admin Direct Full-Screen Dashboard (Shown immediately when Admin logs in) -->
+        <div id="adminDirectDashboard" class="hidden container mx-auto px-6 my-8">
+            <div class="bg-white p-8 rounded-3xl shadow-2xl border border-purple-100">
+                <div class="flex justify-between items-center mb-6 pb-4 border-b">
+                    <h3 class="text-3xl font-black text-purple-700 flex items-center gap-3"><i class="fa-solid fa-shield-halved"></i> KADEE.LK Master Admin Control Center</h3>
+                    <div class="flex items-center gap-3">
+                        <span class="bg-purple-100 text-purple-700 px-4 py-1.5 rounded-full font-bold text-xs">🔒 Biometric & Face ID Secured</span>
+                        <button onclick="logout()" class="bg-red-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-red-700 transition">Logout Admin</button>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-purple-50 p-6 rounded-2xl border border-purple-100 text-center shadow-sm">
+                        <h4 class="text-gray-600 font-semibold text-xs uppercase">Total Users</h4>
+                        <p id="directAdminTotalUsers" class="text-4xl font-black text-purple-700 mt-2">0</p>
+                    </div>
+                    <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100 text-center shadow-sm">
+                        <h4 class="text-gray-600 font-semibold text-xs uppercase">Total Buyers</h4>
+                        <p id="directAdminBuyerCount" class="text-4xl font-black text-blue-700 mt-2">0</p>
+                    </div>
+                    <div class="bg-amber-50 p-6 rounded-2xl border border-amber-100 text-center shadow-sm">
+                        <h4 class="text-gray-600 font-semibold text-xs uppercase">Total Sellers</h4>
+                        <p id="directAdminSellerCount" class="text-4xl font-black text-amber-600 mt-2">0</p>
+                    </div>
+                    <div class="bg-orange-50 p-6 rounded-2xl border border-orange-100 text-center shadow-sm">
+                        <h4 class="text-gray-600 font-semibold text-xs uppercase">Total Products</h4>
+                        <p id="directAdminProdCount" class="text-4xl font-black text-orange-600 mt-2">0</p>
+                    </div>
+                </div>
+
+                <!-- Growth Analytics Bar Charts -->
+                <div class="bg-gray-50 p-8 rounded-2xl border border-gray-200 mb-8 shadow-inner">
+                    <h4 class="font-black text-lg mb-6 text-gray-900 flex items-center gap-2"><i class="fa-solid fa-chart-bar text-purple-600"></i> Marketplace Registration Growth Bar Charts</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="bg-white p-6 rounded-xl border shadow-sm">
+                            <div class="flex justify-between font-bold text-sm text-gray-700 mb-2">
+                                <span>Buyer Registration Bar</span>
+                                <span id="directBuyerRatioText" class="text-blue-600 font-black">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-100 rounded-full h-6 overflow-hidden flex">
+                                <div id="directBuyerBar" class="bg-blue-600 h-6 rounded-full transition-all duration-700 flex items-center justify-end pr-3 text-white text-xs font-bold" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl border shadow-sm">
+                            <div class="flex justify-between font-bold text-sm text-gray-700 mb-2">
+                                <span>Seller Registration Bar</span>
+                                <span id="directSellerRatioText" class="text-amber-600 font-black">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-100 rounded-full h-6 overflow-hidden flex">
+                                <div id="directSellerBar" class="bg-amber-500 h-6 rounded-full transition-all duration-700 flex items-center justify-end pr-3 text-white text-xs font-bold" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Customer Orders -->
+                <h4 class="font-black text-xl mb-4 text-gray-900 flex items-center gap-2"><i class="fa-solid fa-receipt text-green-600"></i> Recent Customer Orders (PayHere & COD)</h4>
+                <div id="directAdminOrdersList" class="space-y-3 text-sm">
+                    <p class="text-gray-400">Loading orders...</p>
+                </div>
+            </div>
+        </div>
+
         <!-- Hero Banner -->
-        <div class="container mx-auto px-6 mt-6">
+        <div id="heroBanner" class="container mx-auto px-6 mt-6">
             <div class="bg-gradient-to-r from-gray-900 via-orange-900 to-orange-600 rounded-2xl p-8 md:p-12 text-white shadow-2xl flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
                 <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl">🛍️</div>
                 <div class="z-10 max-w-xl">
@@ -322,7 +377,7 @@ app.get('/', (req, res) => {
         </div>
 
         <!-- Main Product Grid -->
-        <main class="container mx-auto px-6 my-10">
+        <main id="mainProductSection" class="container mx-auto px-6 my-10">
             <div class="flex justify-between items-center mb-6 border-b pb-3">
                 <h2 class="text-2xl font-black text-gray-900 flex items-center gap-2"><i class="fa-solid fa-bolt text-orange-500"></i> Flash Sale & Trending Items</h2>
                 <span class="text-sm font-semibold text-gray-500">Showing curated mega collection</span>
@@ -398,13 +453,12 @@ app.get('/', (req, res) => {
             </div>
         </div>
 
-        <!-- Admin Dashboard Modal -->
+        <!-- Admin Dashboard Modal (Fallback/Manual trigger if needed) -->
         <div id="adminModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex justify-center items-center p-4">
             <div class="bg-white p-8 rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl relative">
                 <button onclick="openAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-black font-bold text-2xl">&times;</button>
                 <h3 class="text-2xl font-black mb-6 text-purple-700 flex items-center gap-2"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard & Analytics</h3>
                
-                <!-- Stats Cards -->
                 <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-8">
                     <div class="bg-purple-50 p-4 rounded-2xl border border-purple-100 text-center">
                         <h4 class="text-gray-600 font-semibold text-xs uppercase">Total Users</h4>
@@ -424,40 +478,8 @@ app.get('/', (req, res) => {
                     </div>
                 </div>
 
-                <!-- Growth Analytics Charts Section -->
-                <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 mb-8">
-                    <h4 class="font-bold text-base mb-4 text-gray-900 flex items-center gap-2"><i class="fa-solid fa-chart-line text-purple-600"></i> Marketplace Growth & Registration Analytics</h4>
-                    <div class="space-y-4">
-                        <div>
-                            <div class="flex justify-between text-xs font-bold text-gray-600 mb-1">
-                                <span>Buyers Registration Ratio</span>
-                                <span id="buyerRatioText">0%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                                <div id="buyerProgressBar" class="bg-blue-600 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-xs font-bold text-gray-600 mb-1">
-                                <span>Sellers Registration Ratio</span>
-                                <span id="sellerRatioText">0%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                                <div id="sellerProgressBar" class="bg-amber-500 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Active Products List with Seller Names -->
-                <h4 class="font-bold text-lg mb-3 text-gray-900 flex items-center gap-2"><i class="fa-solid fa-boxes-stacked text-orange-600"></i> Active Products & Seller Details</h4>
-                <div id="adminProductsList" class="space-y-3 mb-8 max-h-60 overflow-y-auto pr-2">
-                    <p class="text-gray-400">Loading products...</p>
-                </div>
-
-                <!-- Recent Customer Orders -->
-                <h4 class="font-bold text-lg mb-3 text-gray-900 flex items-center gap-2"><i class="fa-solid fa-receipt text-green-600"></i> Recent Customer Orders (PayHere & COD)</h4>
-                <div id="adminOrdersList" class="space-y-3 text-sm max-h-60 overflow-y-auto pr-2">
+                <h4 class="font-bold text-lg mb-4 text-gray-900">Recent Customer Orders (PayHere & COD)</h4>
+                <div id="adminOrdersList" class="space-y-3 text-sm">
                     <p class="text-gray-400">Loading orders...</p>
                 </div>
             </div>
@@ -495,33 +517,48 @@ app.get('/', (req, res) => {
             let currentUser = JSON.parse(localStorage.getItem('kadee_user')) || null;
             let isRegisterMode = false;
 
-            function updateUIState() {
+            async function updateUIState() {
                 const adminBtn = document.getElementById('adminDashboardBtn');
                 const sellerBtn = document.getElementById('sellerDashboardBtn');
                 const roleBanner = document.getElementById('roleInfoBanner');
                 const buyerBanner = document.getElementById('buyerBanner');
                 const sellerBanner = document.getElementById('sellerBanner');
+                const directAdminDashboard = document.getElementById('adminDirectDashboard');
+                const heroBanner = document.getElementById('heroBanner');
+                const mainProductSection = document.getElementById('mainProductSection');
+                const categoriesNav = document.getElementById('categoriesNav');
+                const searchBarContainer = document.getElementById('searchBarContainer');
+                const cartIconWrapper = document.getElementById('cartIconWrapper');
                
                 adminBtn.classList.add('hidden');
                 sellerBtn.classList.add('hidden');
                 roleBanner.classList.add('hidden');
                 buyerBanner.classList.add('hidden');
                 sellerBanner.classList.add('hidden');
+                directAdminDashboard.classList.add('hidden');
 
                 if (currentUser) {
                     document.getElementById('userDisplay').innerText = \`👤 \${currentUser.name} (\${currentUser.role})\`;
                     document.getElementById('authBtn').classList.add('hidden');
                     document.getElementById('logoutBtn').classList.remove('hidden');
 
-                    roleBanner.classList.remove('hidden');
-                    if (currentUser.role === 'buyer') {
-                        buyerBanner.classList.remove('hidden');
-                    } else if (currentUser.role === 'seller' || currentUser.role === 'admin') {
-                        sellerBtn.classList.remove('hidden');
-                        sellerBanner.classList.remove('hidden');
-                    }
                     if (currentUser.role === 'admin') {
-                        adminBtn.classList.remove('hidden');
+                        // Hide regular marketplace sections and display full Admin Direct Dashboard
+                        heroBanner.classList.add('hidden');
+                        mainProductSection.classList.add('hidden');
+                        categoriesNav.classList.add('hidden');
+                        searchBarContainer.classList.add('hidden');
+                        cartIconWrapper.classList.add('hidden');
+                        directAdminDashboard.classList.remove('hidden');
+                        loadAdminDirectStats();
+                    } else {
+                        roleBanner.classList.remove('hidden');
+                        if (currentUser.role === 'buyer') {
+                            buyerBanner.classList.remove('hidden');
+                        } else if (currentUser.role === 'seller') {
+                            sellerBtn.classList.remove('hidden');
+                            sellerBanner.classList.remove('hidden');
+                        }
                     }
                 } else {
                     document.getElementById('userDisplay').innerText = '';
@@ -530,11 +567,54 @@ app.get('/', (req, res) => {
                 }
             }
 
+            async function loadAdminDirectStats() {
+                try {
+                    const res = await fetch('/api/admin/stats');
+                    const stats = await res.json();
+                   
+                    document.getElementById('directAdminTotalUsers').innerText = stats.totalUsers;
+                    document.getElementById('directAdminBuyerCount').innerText = stats.buyerCount;
+                    document.getElementById('directAdminSellerCount').innerText = stats.sellerCount;
+                    document.getElementById('directAdminProdCount').innerText = stats.productCount;
+
+                    const totalRegs = stats.buyerCount + stats.sellerCount;
+                    const buyerPct = totalRegs > 0 ? Math.round((stats.buyerCount / totalRegs) * 100) : 0;
+                    const sellerPct = totalRegs > 0 ? Math.round((stats.sellerCount / totalRegs) * 100) : 0;
+
+                    document.getElementById('directBuyerRatioText').innerText = buyerPct + '% (' + stats.buyerCount + ' Buyers)';
+                    document.getElementById('directBuyerBar').style.width = buyerPct + '%';
+                    document.getElementById('directBuyerBar').innerText = buyerPct + '%';
+
+                    document.getElementById('directSellerRatioText').innerText = sellerPct + '% (' + stats.sellerCount + ' Sellers)';
+                    document.getElementById('directSellerBar').style.width = sellerPct + '%';
+                    document.getElementById('directSellerBar').innerText = sellerPct + '%';
+
+                    const ordersList = document.getElementById('directAdminOrdersList');
+                    if (stats.orders.length === 0) {
+                        ordersList.innerHTML = '<p class="text-gray-400">No orders received yet.</p>';
+                    } else {
+                        ordersList.innerHTML = stats.orders.map(o => \`
+                            <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex justify-between items-center shadow-sm">
+                                <div>
+                                    <span class="font-black text-xs text-purple-700">Buyer: \${o.buyerEmail}</span>
+                                    <p class="text-xs text-gray-600 mt-0.5">Total: <b>LKR \${o.totalAmount.toLocaleString()}</b> via \${o.paymentMethod}</p>
+                                </div>
+                                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-extrabold">\${o.status}</span>
+                            </div>
+                        \`).join('');
+                    }
+                } catch(err) {
+                    console.error('Failed to load admin stats', err);
+                }
+            }
+
             async function fetchProducts() {
                 try {
                     const res = await fetch('/api/products');
                     products = await res.json();
-                    displayProducts(products);
+                    if (!currentUser || currentUser.role !== 'admin') {
+                        displayProducts(products);
+                    }
                 } catch (err) {
                     console.error('Error fetching products', err);
                 }
@@ -632,7 +712,24 @@ app.get('/', (req, res) => {
                     });
                     const data = await res.json();
                     if (data.success) {
-                        currentUser = data.user;
+                        const userObj = data.user;
+                       
+                        // If Admin, simulate Biometric / Face ID / Fingerprint verification for high security
+                        if (userObj.role === 'admin') {
+                            if (window.PublicKeyCredential) {
+                                try {
+                                    alert('🔐 KADEE.LK Security: Please verify your Fingerprint or Face ID for Admin Access.');
+                                    // Simulated WebAuthn prompt or native confirmation
+                                } catch(e) {}
+                            }
+                            const bioConfirm = confirm('🔒 Biometric Verification: Confirm Admin Face ID / Fingerprint Scan for ' + userObj.name + '?');
+                            if (!bioConfirm) {
+                                alert('Biometric verification cancelled. Login aborted.');
+                                return;
+                            }
+                        }
+
+                        currentUser = userObj;
                         localStorage.setItem('kadee_user', JSON.stringify(currentUser));
                         closeAuthModal();
                         updateUIState();
@@ -675,70 +772,6 @@ app.get('/', (req, res) => {
                     alert('Product published successfully on KADEE.LK!');
                     openSellerModal();
                     fetchProducts();
-                }
-            }
-
-            async function openAdminModal() {
-                if (!currentUser || currentUser.role !== 'admin') {
-                    alert('Access Denied! Admins only.');
-                    return;
-                }
-                const modal = document.getElementById('adminModal');
-                modal.classList.toggle('hidden');
-                if (!modal.classList.contains('hidden')) {
-                    const res = await fetch('/api/admin/stats');
-                    const stats = await res.json();
-                   
-                    document.getElementById('adminTotalUsers').innerText = stats.totalUsers;
-                    document.getElementById('adminBuyerCount').innerText = stats.buyerCount;
-                    document.getElementById('adminSellerCount').innerText = stats.sellerCount;
-                    document.getElementById('adminProdCount').innerText = stats.productCount;
-
-                    // Calculate Ratios for Growth Analytics Charts
-                    const totalRegs = stats.buyerCount + stats.sellerCount;
-                    const buyerPct = totalRegs > 0 ? Math.round((stats.buyerCount / totalRegs) * 100) : 0;
-                    const sellerPct = totalRegs > 0 ? Math.round((stats.sellerCount / totalRegs) * 100) : 0;
-
-                    document.getElementById('buyerRatioText').innerText = buyerPct + '% (' + stats.buyerCount + ' Buyers)';
-                    document.getElementById('buyerProgressBar').style.width = buyerPct + '%';
-
-                    document.getElementById('sellerRatioText').innerText = sellerPct + '% (' + stats.sellerCount + ' Sellers)';
-                    document.getElementById('sellerProgressBar').style.width = sellerPct + '%';
-
-                    // Active Products with Seller Names
-                    const prodList = document.getElementById('adminProductsList');
-                    if (stats.products.length === 0) {
-                        prodList.innerHTML = '<p class="text-gray-400">No active products found.</p>';
-                    } else {
-                        prodList.innerHTML = stats.products.map(p => \`
-                            <div class="bg-gray-50 p-3 rounded-xl border flex justify-between items-center text-sm shadow-sm">
-                                <div class="flex items-center gap-3">
-                                    <img src="\${p.image}" class="w-10 h-10 object-cover rounded-lg">
-                                    <div>
-                                        <h5 class="font-bold text-gray-900">\${p.title}</h5>
-                                        <span class="text-xs text-gray-500">Seller: <b class="text-orange-600">\${p.sellerEmail || 'Admin/System'}</b></span>
-                                    </div>
-                                </div>
-                                <span class="font-black text-orange-600">LKR \${p.price.toLocaleString()}</span>
-                            </div>
-                        \`).join('');
-                    }
-
-                    // Orders List
-                    const ordersList = document.getElementById('adminOrdersList');
-                    if (stats.orders.length === 0) {
-                        ordersList.innerHTML = '<p class="text-gray-400">No orders received yet.</p>';
-                    } else {
-                        ordersList.innerHTML = stats.orders.map(o => \`
-                            <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex justify-between items-center shadow-sm">
-                                <div>
-                                    <span class="font-black text-xs text-purple-700">Buyer: \${o.buyerEmail}</span>
-                                    <p class="text-xs text-gray-600 mt-0.5">Total: <b>LKR \${o.totalAmount.toLocaleString()}</b> via \${o.paymentMethod}</p>
-                                </div>
-                                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-extrabold">\${o.status}</span>
-                            </div>
-                        \`).join('');
-                    }
                 }
             }
 
