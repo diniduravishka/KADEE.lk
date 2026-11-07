@@ -9,18 +9,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // MongoDB Connection
-const MONGO_URI = process.env.MONGO_URI;
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/kadee_lk';
 
-if (MONGO_URI) {
-  mongoose.connect(MONGO_URI)
-    .then(() => {
-      console.log('MongoDB Connected Successfully to KADEE.LK Marketplace!');
-      seedDatabase();
-    })
-    .catch((err) => console.error('MongoDB Connection Error:', err));
-} else {
-  console.error('MONGO_URI is missing in environment variables!');
-}
+mongoose.connect(MONGO_URI)
+  .then(() => {
+    console.log('✅ MongoDB Connected Successfully to KADEE.LK Marketplace!');
+    seedDatabase();
+  })
+  .catch((err) => console.error('❌ MongoDB Connection Error:', err));
 
 // 1. User Schema
 const userSchema = new mongoose.Schema({
@@ -80,7 +76,7 @@ async function seedDatabase() {
         { title: 'Smart Watch', price: 19990, category: 'Electronics', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500', sellerEmail: 'Maheshi@example.com', rating: 4.6, reviewsCount: 85 },
         { title: 'Wireless Earphones', price: 12990, category: 'Electronics', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500', sellerEmail: 'diniduravishka649@gmail.com', rating: 4.5, reviewsCount: 72 }
       ]);
-      console.log('Luxury Gold theme products seeded successfully!');
+      console.log('✨ Luxury Gold theme products seeded successfully!');
     }
   } catch (err) {
     console.error('Error in database seeding:', err);
@@ -94,7 +90,7 @@ app.post('/api/register', async (req, res) => {
     const { name, email, password, role } = req.body;
     const existingUser = await User.findOne({ email: email.trim().toLowerCase() });
     if (existingUser) return res.status(400).json({ error: 'Email already registered!' });
-   
+  
     const assignedRole = (role === 'seller') ? 'seller' : 'buyer';
     const newUser = new User({ name: name.trim(), email: email.trim().toLowerCase(), password: password.trim(), role: assignedRole });
     await newUser.save();
@@ -108,12 +104,12 @@ app.post('/api/login', async (req, res) => {
   try {
     const loginInput = req.body.email ? req.body.email.trim() : '';
     const passwordInput = req.body.password ? req.body.password.trim() : '';
-   
+  
     const user = await User.findOne({
       $or: [{ email: loginInput.toLowerCase() }, { name: loginInput }],
       password: passwordInput
     });
-   
+  
     if (!user) return res.status(400).json({ error: 'Invalid username/email or password!' });
     res.json({ success: true, user });
   } catch (err) {
@@ -167,7 +163,7 @@ app.get('/api/admin/stats', async (req, res) => {
   }
 });
 
-// --- FRONTEND UI (Luxury Black & Gold Curved Wave Theme matching Reference 3) ---
+// --- FRONTEND UI (Luxury Black & Gold Curved Wave Theme) ---
 app.get('/', (req, res) => {
   res.send(`
     <!DOCTYPE html>
@@ -184,8 +180,8 @@ app.get('/', (req, res) => {
             .gold-text { color: #f3ba2f; }
             .gold-bg { background-color: #f3ba2f; }
             .gold-border { border-color: #f3ba2f; }
-           
-            /* Exact Luxury Curved Gold Wave Background matching Reference Image 3 */
+          
+            /* Luxury Curved Gold Wave Background */
             .luxury-curved-bg {
                 background:
                     radial-gradient(circle at top right, rgba(243, 186, 47, 0.22) 0%, rgba(212, 160, 23, 0.08) 35%, transparent 60%),
@@ -206,7 +202,7 @@ app.get('/', (req, res) => {
     </head>
     <body class="luxury-curved-bg text-white">
 
-        <!-- Top Header Bar with Phone, Email & Track Order | Help | About Us -->
+        <!-- Top Header Bar -->
         <div class="bg-[#101010] text-xs py-2 px-6 flex justify-between items-center border-b border-zinc-800 relative z-20">
             <div class="flex items-center space-x-6">
                 <span><i class="fa-solid fa-phone gold-text mr-1"></i> +94 70 7521 138</span>
@@ -229,7 +225,7 @@ app.get('/', (req, res) => {
                     <div class="bg-gradient-to-r from-amber-500 to-yellow-300 text-black p-2 rounded-xl shadow"><i class="fa-solid fa-store"></i></div>
                     KADEE<span class="gold-text">.LK</span>
                 </a>
-               
+              
                 <div class="flex-1 max-w-2xl relative hidden md:block" id="searchBarContainer">
                     <input type="search" id="searchInput" autocomplete="off" placeholder="Search for products..." class="w-full py-3 px-5 rounded-l-xl text-gray-900 focus:outline-none shadow-inner font-medium">
                     <button onclick="searchProducts()" class="absolute right-0 top-0 bg-gradient-to-r from-amber-500 to-yellow-400 text-black px-8 py-3 rounded-r-xl font-extrabold hover:opacity-90 transition shadow">
@@ -274,7 +270,7 @@ app.get('/', (req, res) => {
             </div>
         </nav>
 
-        <!-- Admin Direct Full-Screen Dashboard (Shown immediately when Admin logs in) -->
+        <!-- Admin Direct Full-Screen Dashboard -->
         <div id="adminDirectDashboard" class="hidden container mx-auto px-6 my-8 text-gray-900">
             <div class="bg-white p-8 rounded-3xl shadow-2xl border border-amber-500">
                 <div class="flex justify-between items-center mb-6 pb-4 border-b">
@@ -338,7 +334,7 @@ app.get('/', (req, res) => {
             </div>
         </div>
 
-        <!-- Hero Section with Luxury Gold Curves matching Reference 3 -->
+        <!-- Hero Section -->
         <div id="heroBanner" class="container mx-auto px-6 mt-8 relative z-10">
             <div class="flex flex-col md:flex-row justify-between items-center py-8">
                 <div class="max-w-xl">
@@ -349,14 +345,12 @@ app.get('/', (req, res) => {
                         Shop Now <i class="fa-solid fa-arrow-right"></i>
                     </button>
                 </div>
-                <!-- Shopping Cart Illustration Box on the right matching Reference 3 -->
                 <div class="mt-8 md:mt-0 flex flex-col items-center">
                     <div class="bg-[#121212]/95 backdrop-blur-md p-8 rounded-3xl border border-amber-500/50 shadow-2xl relative text-center">
                         <div class="absolute -top-3 -right-3 gold-bg text-black text-xs font-black px-3 py-1 rounded-full shadow">MEGA CART</div>
                         <i class="fa-solid fa-cart-shopping text-7xl gold-text mb-4"></i>
                         <p class="text-xs font-bold text-zinc-300">Fast Islandwide Checkout</p>
                     </div>
-                    <!-- Trust Badges -->
                     <div class="flex space-x-3 mt-6">
                         <div class="bg-[#121212] px-4 py-2 rounded-full flex items-center gap-2 border border-zinc-800 text-xs shadow">
                             <i class="fa-solid fa-check gold-text"></i> Secure Payment
@@ -424,13 +418,13 @@ app.get('/', (req, res) => {
                 <h2 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-star gold-text"></i> Featured Products</h2>
                 <button onclick="filterCategory('All')" class="text-sm font-semibold text-zinc-400 hover:gold-text flex items-center gap-1">View All <i class="fa-solid fa-arrow-right"></i></button>
             </div>
-           
+          
             <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 <div class="text-center col-span-full py-16 text-zinc-400 font-medium">Loading products...</div>
             </div>
         </main>
 
-        <!-- Footer matching layout -->
+        <!-- Footer -->
         <footer class="bg-[#121212] pt-12 pb-6 border-t border-zinc-800 mt-16 text-sm relative z-10">
             <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                 <div>
@@ -473,12 +467,12 @@ app.get('/', (req, res) => {
             </div>
         </footer>
 
-        <!-- Auth Modal (Login placeholder: Dinidu ravishka, Register placeholder: Maheshi@example.gamil.com) -->
+        <!-- Auth Modal -->
         <div id="authModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex justify-center items-center p-4 text-gray-900">
             <div class="bg-white p-8 rounded-3xl w-full max-w-md shadow-2xl relative border border-amber-500">
                 <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-black font-bold text-2xl">&times;</button>
                 <h3 id="authTitle" class="text-2xl font-black mb-6 text-black">Login to KADEE.LK</h3>
-               
+              
                 <div id="registerFields" class="hidden space-y-4 mb-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Full Name</label>
@@ -578,13 +572,13 @@ app.get('/', (req, res) => {
                 const mainProductSection = document.getElementById('mainProductSection');
                 const categoriesNav = document.getElementById('categoriesNav');
                 const categoryIconsRow = document.getElementById('categoryIconsRow');
-               
+              
                 adminBtn.classList.add('hidden');
                 sellerBtn.classList.add('hidden');
                 directAdminDashboard.classList.add('hidden');
 
                 if (currentUser) {
-                    document.getElementById('userDisplay').innerText = \`👤 \${currentUser.name} (\${currentUser.role})\`;
+                    document.getElementById('userDisplay').innerText = `👤 ${currentUser.name} (${currentUser.role})`;
                     document.getElementById('authBtn').classList.add('hidden');
                     document.getElementById('logoutBtn').classList.remove('hidden');
 
@@ -613,7 +607,7 @@ app.get('/', (req, res) => {
                 try {
                     const res = await fetch('/api/admin/stats');
                     const stats = await res.json();
-                   
+                  
                     document.getElementById('directAdminTotalUsers').innerText = stats.totalUsers;
                     document.getElementById('directAdminBuyerCount').innerText = stats.buyerCount;
                     document.getElementById('directAdminSellerCount').innerText = stats.sellerCount;
@@ -635,15 +629,15 @@ app.get('/', (req, res) => {
                     if (stats.orders.length === 0) {
                         ordersList.innerHTML = '<p class="text-gray-400">No orders received yet.</p>';
                     } else {
-                        ordersList.innerHTML = stats.orders.map(o => \`
+                        ordersList.innerHTML = stats.orders.map(o => `
                             <div class="bg-gray-50 p-4 rounded-2xl border flex justify-between items-center shadow-sm">
                                 <div>
-                                    <span class="font-black text-xs text-amber-700">Buyer: \${o.buyerEmail}</span>
-                                    <p class="text-xs text-gray-600 mt-0.5">Total: <b>Rs. \${o.totalAmount.toLocaleString()}</b> via \${o.paymentMethod}</p>
+                                    <span class="font-black text-xs text-amber-700">Buyer: ${o.buyerEmail}</span>
+                                    <p class="text-xs text-gray-600 mt-0.5">Total: <b>Rs. ${o.totalAmount.toLocaleString()}</b> via ${o.paymentMethod}</p>
                                 </div>
-                                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-extrabold">\${o.status}</span>
+                                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-extrabold">${o.status}</span>
                             </div>
-                        \`).join('');
+                        `).join('');
                     }
                 } catch(err) {
                     console.error('Failed to load admin stats', err);
@@ -668,26 +662,26 @@ app.get('/', (req, res) => {
                     grid.innerHTML = '<p class="col-span-full text-center text-zinc-400 py-12">No products available.</p>';
                     return;
                 }
-                grid.innerHTML = items.map(p => \`
+                grid.innerHTML = items.map(p => `
                     <div class="bg-white text-gray-900 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 p-3 flex flex-col justify-between border border-zinc-200 group">
                         <div>
                             <div class="relative overflow-hidden rounded-xl mb-3 bg-gray-100">
-                                <img src="\${p.image}" alt="\${p.title}" class="w-full h-40 object-cover group-hover:scale-105 transition duration-300">
+                                <img src="${p.image}" alt="${p.title}" class="w-full h-40 object-cover group-hover:scale-105 transition duration-300">
                             </div>
-                            <h3 class="font-bold text-gray-900 text-sm line-clamp-1">\${p.title}</h3>
-                            <div class="text-amber-600 font-black text-base mt-1">Rs. \${p.price.toLocaleString()}</div>
+                            <h3 class="font-bold text-gray-900 text-sm line-clamp-1">${p.title}</h3>
+                            <div class="text-amber-600 font-black text-base mt-1">Rs. ${p.price.toLocaleString()}</div>
                             <div class="flex items-center gap-1 text-yellow-500 text-xs mt-1 font-semibold">
-                                <span>⭐ \${p.rating}</span>
-                                <span class="text-gray-400">(\${p.reviewsCount || 75})</span>
+                                <span>⭐ ${p.rating}</span>
+                                <span class="text-gray-400">(${p.reviewsCount || 75})</span>
                             </div>
                         </div>
                         <div class="mt-4 pt-3 border-t border-gray-100">
-                            <button onclick="addToCart('\${p._id}')" class="w-full bg-[#f3ba2f] hover:opacity-90 text-black py-2 rounded-xl font-bold text-xs shadow transition flex items-center justify-center gap-1.5">
+                            <button onclick="addToCart('${p._id}')" class="w-full bg-[#f3ba2f] hover:opacity-90 text-black py-2 rounded-xl font-bold text-xs shadow transition flex items-center justify-center gap-1.5">
                                 <i class="fa-solid fa-cart-plus"></i> Add to Cart
                             </button>
                         </div>
                     </div>
-                \`).join('');
+                `).join('');
             }
 
             function filterCategory(cat) {
@@ -705,15 +699,14 @@ app.get('/', (req, res) => {
                 document.getElementById('authModal').classList.remove('hidden');
             }
             function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
-           
+          
             function toggleAuthMode() {
                 isRegisterMode = !isRegisterMode;
                 document.getElementById('authTitle').innerText = isRegisterMode ? 'Create KADEE.LK Account' : 'Login to KADEE.LK';
                 document.getElementById('registerFields').classList.toggle('hidden');
                 document.getElementById('authSubmitBtn').innerText = isRegisterMode ? 'Register Now' : 'Login';
                 document.getElementById('authToggleText').innerText = isRegisterMode ? 'Already have an account?' : "Don't have an account?";
-               
-                // Switch placeholder based on mode
+              
                 if (isRegisterMode) {
                     document.getElementById('authEmail').placeholder = 'Maheshi@example.gamil.com';
                 } else {
@@ -784,7 +777,7 @@ app.get('/', (req, res) => {
                 const category = document.getElementById('prodCategory').value;
                 const image = document.getElementById('prodImage').value;
                 if (!title || !price || !category || !image) { alert('Please fill in all product details!'); return; }
-               
+              
                 const res = await fetch('/api/products', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -821,18 +814,18 @@ app.get('/', (req, res) => {
                 }
                 container.innerHTML = cart.map((item, index) => {
                     total += item.price;
-                    return \`
+                    return `
                         <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border">
                             <div class="flex items-center gap-3">
-                                <img src="\${item.image}" class="w-12 h-12 object-cover rounded-lg">
+                                <img src="${item.image}" class="w-12 h-12 object-cover rounded-lg">
                                 <div>
-                                    <h4 class="font-bold text-sm line-clamp-1">\${item.title}</h4>
-                                    <span class="text-amber-700 font-extrabold text-xs">Rs. \${item.price.toLocaleString()}</span>
+                                    <h4 class="font-bold text-sm line-clamp-1">${item.title}</h4>
+                                    <span class="text-amber-700 font-extrabold text-xs">Rs. ${item.price.toLocaleString()}</span>
                                 </div>
                             </div>
-                            <button onclick="removeFromCart(\--index)" class="text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>
+                            <button onclick="removeFromCart(${index})" class="text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>
                         </div>
-                    \`;
+                    `;
                 }).join('');
                 document.getElementById('cartTotal').innerText = 'Rs. ' + total.toLocaleString();
                 document.getElementById('cartTotalText').innerText = 'Rs. ' + total.toLocaleString();
@@ -872,5 +865,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`🚀 KADEE.LK Server is running on port ${PORT}`);
 }); 
