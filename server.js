@@ -167,7 +167,7 @@ app.get('/api/admin/stats', async (req, res) => {
   }
 });
 
-// --- FRONTEND UI (Exact LankaCart Black & Gold Curved Wave Theme matching Reference) ---
+// --- FRONTEND UI (Exact Luxury Black & Gold Curved Wave Background) ---
 app.get('/', (req, res) => {
   res.send(`
     <!DOCTYPE html>
@@ -180,41 +180,37 @@ app.get('/', (req, res) => {
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
-            body { font-family: 'Poppins', sans-serif; background-color: #0b0b0b; color: #fff; overflow-x: hidden; }
-            .gold-text { color: #e5c158; }
+            body { font-family: 'Poppins', sans-serif; background-color: #000000; color: #fff; overflow-x: hidden; }
+            .gold-text { color: #f3ba2f; }
             .gold-bg { background: linear-gradient(135deg, #f5d77f 0%, #d4af37 50%, #aa820a 100%); color: #000; }
-            .gold-border { border-color: #d4af37; }
+            .gold-border { border-color: #f3ba2f; }
           
-            /* Exact LankaCart Curved Gold Wave Background Styling */
+            /* Exact Luxury Curved Gold Wave Background matching Reference */
             .luxury-curved-bg {
                 background:
-                    radial-gradient(circle at top right, rgba(212, 175, 55, 0.25) 0%, rgba(20, 20, 20, 0.8) 40%, #050505 80%),
-                    linear-gradient(180deg, #111111 0%, #050505 100%);
+                    radial-gradient(circle at top right, rgba(243, 186, 47, 0.28) 0%, rgba(212, 160, 23, 0.1) 35%, transparent 65%),
+                    radial-gradient(circle at 85% 45%, rgba(243, 186, 47, 0.18) 0%, transparent 55%),
+                    linear-gradient(135deg, #0b0b0b 0%, #000000 100%);
                 position: relative;
             }
-            .gold-wave-banner {
-                background: linear-gradient(135deg, #161616 0%, #0a0a0a 100%);
-                border-bottom: 2px solid rgba(212, 175, 55, 0.3);
-                position: relative;
-                overflow: hidden;
-            }
-            .gold-wave-banner::after {
+            .luxury-curved-bg::before {
                 content: '';
                 position: absolute;
-                bottom: -50px; right: -50px; width: 400px; height: 200px;
-                background: radial-gradient(ellipse, rgba(212, 175, 55, 0.2) 0%, transparent 70%);
-                border-radius: 50%;
+                top: 0; right: 0; width: 70%; height: 500px;
+                background: radial-gradient(ellipse at top right, rgba(243, 186, 47, 0.22) 0%, rgba(0,0,0,0) 75%);
+                border-bottom-left-radius: 100% 50%;
                 pointer-events: none;
+                z-index: 1;
             }
         </style>
     </head>
     <body class="luxury-curved-bg text-white">
 
         <!-- Top Header Bar with Phone, Email & Track Order | Help | About Us -->
-        <div class="bg-[#080808] text-xs py-2 px-6 flex justify-between items-center border-b border-zinc-800/80 relative z-20">
+        <div class="bg-[#101010] text-xs py-2 px-6 flex justify-between items-center border-b border-zinc-800 relative z-20">
             <div class="flex items-center space-x-6 text-zinc-300">
-                <span><i class="fa-solid fa-phone gold-text mr-1"></i> +94 77 123 4567</span>
-                <span><i class="fa-solid fa-envelope gold-text mr-1"></i> info@kadeelk.lk</span>
+                <span><i class="fa-solid fa-phone gold-text mr-1"></i> +94 70 7521 138</span>
+                <span><i class="fa-solid fa-envelope gold-text mr-1"></i> diniduravishka649@gmail.com</span>
             </div>
             <div class="flex space-x-4 items-center font-medium">
                 <span id="userDisplay" class="text-amber-200"></span>
@@ -227,21 +223,21 @@ app.get('/', (req, res) => {
         </div>
 
         <!-- Main Header -->
-        <header id="mainHeader" class="bg-[#0e0e0e]/95 backdrop-blur-md py-4 shadow-2xl sticky top-0 z-50 border-b border-zinc-800">
+        <header id="mainHeader" class="bg-[#0b0b0b]/95 backdrop-blur-md py-4 shadow-xl sticky top-0 z-50 border-b border-zinc-800">
             <div class="container mx-auto px-6 flex items-center justify-between gap-4">
                 <a href="/" class="text-3xl font-black tracking-wider flex items-center gap-2">
-                    <div class="gold-bg text-black p-2.5 rounded-xl shadow-lg"><i class="fa-solid fa-store"></i></div>
+                    <div class="gold-bg p-2 rounded-xl shadow"><i class="fa-solid fa-store"></i></div>
                     KADEE<span class="gold-text">.LK</span>
                 </a>
               
                 <div class="flex-1 max-w-2xl relative hidden md:block" id="searchBarContainer">
                     <input type="search" id="searchInput" autocomplete="off" placeholder="Search for products..." class="w-full py-3 px-5 rounded-l-xl text-gray-900 focus:outline-none shadow-inner font-medium">
-                    <button onclick="searchProducts()" class="absolute right-0 top-0 gold-bg px-8 py-3 rounded-r-xl font-extrabold hover:opacity-95 transition shadow">
+                    <button onclick="searchProducts()" class="absolute right-0 top-0 gold-bg px-8 py-3 rounded-r-xl font-extrabold hover:opacity-90 transition shadow">
                         <i class="fa-solid fa-search"></i>
                     </button>
                 </div>
 
-                <div class="flex items-center space-x-5">
+                <div class="flex items-center space-x-6">
                     <button id="adminDashboardBtn" onclick="openAdminModal()" class="hidden bg-zinc-900 hover:bg-zinc-800 text-white px-4 py-2 rounded-xl font-bold text-sm shadow transition flex items-center gap-2 border gold-border">
                         <i class="fa-solid fa-gauge-high gold-text"></i> Admin Panel
                     </button>
@@ -252,7 +248,7 @@ app.get('/', (req, res) => {
                         <i class="fa-solid fa-user text-lg gold-text"></i> Login / Register
                     </button>
                     <button id="logoutBtn" onclick="logout()" class="hidden bg-red-600 text-white px-3 py-1.5 rounded-xl font-bold text-sm">Logout</button>
-                    <div id="cartIconWrapper" class="cursor-pointer flex items-center gap-2 gold-bg text-black px-4 py-2 rounded-xl transition shadow-lg font-bold" onclick="toggleCart()">
+                    <div id="cartIconWrapper" class="cursor-pointer flex items-center gap-2 gold-bg text-black px-4 py-2 rounded-xl transition shadow font-bold" onclick="toggleCart()">
                         <i class="fa-solid fa-cart-shopping text-xl"></i>
                         <span id="cartCount" class="bg-black text-amber-300 rounded-full px-2 py-0.5 text-xs font-black">0</span>
                         <span id="cartTotalText" class="font-extrabold text-sm">Rs. 0</span>
@@ -262,7 +258,7 @@ app.get('/', (req, res) => {
         </header>
 
         <!-- Navigation Bar -->
-        <nav id="categoriesNav" class="bg-[#121212] border-t border-zinc-800 shadow-lg sticky top-[76px] z-40">
+        <nav id="categoriesNav" class="bg-[#121212] border-t border-zinc-800 shadow-sm sticky top-[76px] z-40">
             <div class="container mx-auto px-6 py-3 flex items-center justify-between overflow-x-auto text-sm font-bold text-zinc-300">
                 <div class="flex space-x-8 items-center">
                     <button onclick="filterCategory('All')" class="gold-bg text-black px-4 py-2 rounded-xl flex items-center gap-2 shadow font-extrabold"><i class="fa-solid fa-bars"></i> All Categories</button>
@@ -337,34 +333,34 @@ app.get('/', (req, res) => {
             </div>
         </div>
 
-        <!-- Hero Section with Luxury Gold Waves matching Reference Image -->
-        <div id="heroBanner" class="container mx-auto px-6 mt-6 relative z-10">
-            <div class="gold-wave-banner rounded-3xl p-8 md:p-12 shadow-2xl flex flex-col md:flex-row justify-between items-center relative">
-                <div class="max-w-xl z-10">
-                    <h1 class="text-4xl md:text-5xl font-black mb-3 leading-tight">Welcome to <br><span class="gold-text">KADEE.LK</span></h1>
-                    <p class="text-xl font-bold mb-2 text-zinc-200">Your One-Stop Online Marketplace</p>
-                    <p class="text-zinc-400 text-sm mb-6 leading-relaxed">Shop from thousands of products with trust and convenience across Sri Lanka.</p>
-                    <button onclick="window.scrollTo({top: 600, behavior: 'smooth'})" class="gold-bg text-black font-extrabold px-8 py-3.5 rounded-2xl shadow-xl hover:opacity-90 transition flex items-center gap-2">
+        <!-- Hero Section with Luxury Gold Curves matching Reference -->
+        <div id="heroBanner" class="container mx-auto px-6 mt-8 relative z-10">
+            <div class="flex flex-col md:flex-row justify-between items-center py-8">
+                <div class="max-w-xl">
+                    <h1 class="text-4xl md:text-5xl font-black mb-3">Welcome to <br><span class="gold-text">KADEE.LK</span></h1>
+                    <p class="text-xl font-bold mb-2">Your One-Stop Online Marketplace</p>
+                    <p class="text-zinc-400 text-sm mb-6">Shop from thousands of products with trust and convenience.</p>
+                    <button onclick="window.scrollTo({top: 600, behavior: 'smooth'})" class="gold-bg font-extrabold px-8 py-3.5 rounded-2xl shadow-xl hover:opacity-90 transition flex items-center gap-2">
                         Shop Now <i class="fa-solid fa-arrow-right"></i>
                     </button>
                 </div>
-                <!-- Shopping Cart Illustration Box matching Reference -->
-                <div class="mt-8 md:mt-0 flex flex-col items-center z-10">
-                    <div class="bg-[#121212]/90 backdrop-blur-md p-8 rounded-3xl border border-amber-500/40 shadow-2xl relative text-center">
-                        <div class="absolute -top-3 -right-3 gold-bg text-black text-xs font-black px-3 py-1 rounded-full shadow">EXPRESS CART</div>
-                        <i class="fa-solid fa-cart-shopping text-7xl gold-text mb-3"></i>
+                <!-- Shopping Cart Illustration Box on the right matching Reference -->
+                <div class="mt-8 md:mt-0 flex flex-col items-center">
+                    <div class="bg-[#121212]/95 backdrop-blur-md p-8 rounded-3xl border border-amber-500/50 shadow-2xl relative text-center">
+                        <div class="absolute -top-3 -right-3 gold-bg text-xs font-black px-3 py-1 rounded-full shadow">EXPRESS CART</div>
+                        <i class="fa-solid fa-cart-shopping text-7xl gold-text mb-4"></i>
                         <p class="text-xs font-bold text-zinc-300">Fast Islandwide Checkout</p>
                     </div>
                     <!-- Trust Badges -->
                     <div class="flex space-x-3 mt-6">
-                        <div class="bg-[#181818] px-4 py-2 rounded-full flex items-center gap-2 border border-zinc-800 text-xs shadow">
-                            <i class="fa-solid fa-shield-halved gold-text"></i> Secure Payment
+                        <div class="bg-[#121212] px-4 py-2 rounded-full flex items-center gap-2 border border-zinc-800 text-xs shadow">
+                            <i class="fa-solid fa-check gold-text"></i> Secure Payment
                         </div>
-                        <div class="bg-[#181818] px-4 py-2 rounded-full flex items-center gap-2 border border-zinc-800 text-xs shadow">
-                            <i class="fa-solid fa-truck gold-text"></i> Fast Delivery
+                        <div class="bg-[#121212] px-4 py-2 rounded-full flex items-center gap-2 border border-zinc-800 text-xs shadow">
+                            <i class="fa-solid fa-check gold-text"></i> Fast Delivery
                         </div>
-                        <div class="bg-[#181818] px-4 py-2 rounded-full flex items-center gap-2 border border-zinc-800 text-xs shadow">
-                            <i class="fa-solid fa-rotate-left gold-text"></i> Easy Returns
+                        <div class="bg-[#121212] px-4 py-2 rounded-full flex items-center gap-2 border border-zinc-800 text-xs shadow">
+                            <i class="fa-solid fa-check gold-text"></i> Easy Returns
                         </div>
                     </div>
                 </div>
@@ -372,8 +368,8 @@ app.get('/', (req, res) => {
         </div>
 
         <!-- Categories Icons Row -->
-        <div id="categoryIconsRow" class="container mx-auto px-6 my-8 relative z-10">
-            <div class="bg-[#121212] p-6 rounded-3xl grid grid-cols-3 sm:grid-cols-5 md:grid-cols-10 gap-4 text-center border border-zinc-800/80 shadow-2xl">
+        <div id="categoryIconsRow" class="container mx-auto px-6 my-10 relative z-10">
+            <div class="bg-[#121212] p-6 rounded-3xl grid grid-cols-3 sm:grid-cols-5 md:grid-cols-10 gap-4 text-center border border-zinc-800 shadow-2xl">
                 <div onclick="filterCategory('Mobiles')" class="cursor-pointer group">
                     <div class="bg-white/5 group-hover:gold-bg group-hover:text-black p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-mobile-screen text-xl gold-text group-hover:text-black"></i></div>
                     <span class="text-xs font-semibold">Mobiles</span>
@@ -430,11 +426,11 @@ app.get('/', (req, res) => {
         </main>
 
         <!-- Footer matching layout -->
-        <footer class="bg-[#0e0e0e] pt-12 pb-6 border-t border-zinc-800 mt-16 text-sm relative z-10">
+        <footer class="bg-[#121212] pt-12 pb-6 border-t border-zinc-800 mt-16 text-sm relative z-10">
             <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                 <div>
                     <a href="/" class="text-2xl font-black tracking-wider flex items-center gap-2 mb-4">
-                        <div class="gold-bg text-black p-1.5 rounded-lg shadow"><i class="fa-solid fa-store"></i></div>
+                        <div class="gold-bg p-1.5 rounded-lg shadow"><i class="fa-solid fa-store"></i></div>
                         KADEE<span class="gold-text">.LK</span>
                     </a>
                     <p class="text-zinc-400 text-xs leading-relaxed">Shop Smart... Live Better...</p>
@@ -451,8 +447,8 @@ app.get('/', (req, res) => {
                 <div>
                     <h4 class="font-bold mb-4 text-white">Customer Support</h4>
                     <ul class="space-y-2 text-zinc-400 text-xs">
-                        <li><i class="fa-solid fa-phone gold-text mr-1"></i> +94 77 123 4567</li>
-                        <li><i class="fa-solid fa-envelope gold-text mr-1"></i> info@kadeelk.lk</li>
+                        <li><i class="fa-solid fa-phone gold-text mr-1"></i> +94 70 7521 138</li>
+                        <li><i class="fa-solid fa-envelope gold-text mr-1"></i> diniduravishka649@gmail.com</li>
                         <li><i class="fa-solid fa-clock gold-text mr-1"></i> Mon - Sat: 8.00 AM - 8.00 PM</li>
                     </ul>
                 </div>
@@ -502,7 +498,7 @@ app.get('/', (req, res) => {
                         <input type="password" id="authPassword" autocomplete="new-password" placeholder="••••••••" class="w-full p-3 border rounded-xl outline-none">
                     </div>
                 </div>
-                <button onclick="handleAuthSubmit()" id="authSubmitBtn" class="w-full gold-bg text-black py-3 rounded-xl font-bold hover:opacity-95 transition shadow-lg">Login</button>
+                <button onclick="handleAuthSubmit()" id="authSubmitBtn" class="w-full gold-bg py-3 rounded-xl font-bold hover:opacity-90 transition shadow-lg">Login</button>
                 <p class="text-sm text-center mt-6 text-gray-600">
                     <span id="authToggleText">Don't have an account?</span>
                     <button onclick="toggleAuthMode()" class="gold-text font-extrabold underline ml-1 text-amber-700">Register here</button>
@@ -533,7 +529,7 @@ app.get('/', (req, res) => {
                         <input type="text" id="prodImage" autocomplete="off" placeholder="https://images.unsplash.com/..." class="w-full p-3 border rounded-xl outline-none">
                     </div>
                 </div>
-                <button onclick="addNewProduct()" class="w-full gold-bg text-black py-3 rounded-xl font-bold hover:opacity-95 transition shadow-lg">Publish Product</button>
+                <button onclick="addNewProduct()" class="w-full gold-bg py-3 rounded-xl font-bold hover:opacity-90 transition shadow-lg">Publish Product</button>
             </div>
         </div>
 
@@ -558,7 +554,7 @@ app.get('/', (req, res) => {
                         <option value="COD">Cash on Delivery (COD)</option>
                     </select>
                 </div>
-                <button onclick="checkout()" class="w-full gold-bg text-black py-3.5 rounded-xl font-black hover:opacity-95 transition shadow-lg">Proceed to Checkout</button>
+                <button onclick="checkout()" class="w-full gold-bg py-3.5 rounded-xl font-black hover:opacity-90 transition shadow-lg">Proceed to Checkout</button>
             </div>
         </div>
 
@@ -674,14 +670,14 @@ app.get('/', (req, res) => {
                                 <img src="\${p.image}" alt="\${p.title}" class="w-full h-40 object-cover group-hover:scale-105 transition duration-300">
                             </div>
                             <h3 class="font-bold text-gray-900 text-sm line-clamp-1">\${p.title}</h3>
-                            <div class="text-amber-700 font-black text-base mt-1">Rs. \${p.price.toLocaleString()}</div>
+                            <div class="text-amber-600 font-black text-base mt-1">Rs. \${p.price.toLocaleString()}</div>
                             <div class="flex items-center gap-1 text-yellow-500 text-xs mt-1 font-semibold">
                                 <span>⭐ \${p.rating}</span>
                                 <span class="text-gray-400">(\${p.reviewsCount || 75})</span>
                             </div>
                         </div>
                         <div class="mt-4 pt-3 border-t border-gray-100">
-                            <button onclick="addToCart('\${p._id}')" class="w-full gold-bg hover:opacity-95 text-black py-2 rounded-xl font-bold text-xs shadow transition flex items-center justify-center gap-1.5">
+                            <button onclick="addToCart('\${p._id}')" class="w-full gold-bg hover:opacity-90 text-black py-2 rounded-xl font-bold text-xs shadow transition flex items-center justify-center gap-1.5">
                                 <i class="fa-solid fa-cart-plus"></i> Add to Cart
                             </button>
                         </div>
