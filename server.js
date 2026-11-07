@@ -14,7 +14,7 @@ const MONGO_URI = process.env.MONGO_URI;
 if (MONGO_URI) {
   mongoose.connect(MONGO_URI)
     .then(() => {
-      console.log('MongoDB Connected Successfully to KADEE.LK Mega Marketplace!');
+      console.log('MongoDB Connected Successfully to KADEE.LK Marketplace!');
       seedDatabase();
     })
     .catch((err) => console.error('MongoDB Connection Error:', err));
@@ -40,7 +40,7 @@ const productSchema = new mongoose.Schema({
   image: String,
   sellerEmail: String,
   rating: { type: Number, default: 4.8 },
-  reviews: [{ user: String, comment: String, rating: Number }]
+  reviewsCount: { type: Number, default: 75 }
 });
 const Product = mongoose.model('Product', productSchema);
 
@@ -60,39 +60,27 @@ async function seedDatabase() {
   try {
     await User.findOneAndUpdate(
       { email: 'diniduravishka649@gmail.com' },
-      {
-        name: 'Dinidu ravishka',
-        email: 'diniduravishka649@gmail.com',
-        password: 'ACD172aus@kc',
-        role: 'admin'
-      },
+      { name: 'Dinidu ravishka', email: 'diniduravishka649@gmail.com', password: 'ACD172aus@kc', role: 'admin' },
       { upsert: true, new: true }
     );
 
     await User.findOneAndUpdate(
       { email: 'Maheshi@example.com' },
-      {
-        name: 'Maheshi herath',
-        email: 'Maheshi@example.com',
-        password: 'PMD1512hmp#@qc',
-        role: 'admin'
-      },
+      { name: 'Maheshi herath', email: 'Maheshi@example.com', password: 'PMD1512hmp#@qc', role: 'admin' },
       { upsert: true, new: true }
     );
-
-    console.log('Default Admin Accounts verified & updated successfully!');
 
     const count = await Product.countDocuments();
     if (count === 0) {
       await Product.insertMany([
-        { title: 'Wireless Bluetooth Gaming Headphones', price: 8500, category: 'Electronics', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500', sellerEmail: 'diniduravishka649@gmail.com', rating: 4.8 },
-        { title: 'Smart Watch Series 8 Ultra', price: 15400, category: 'Electronics', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500', sellerEmail: 'diniduravishka649@gmail.com', rating: 4.9 },
-        { title: 'Classic Casual Sports Sneakers', price: 5900, category: 'Fashion', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500', sellerEmail: 'Maheshi@example.com', rating: 4.6 },
-        { title: 'Professional DSLR Camera 4K', price: 125000, category: 'Electronics', image: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500', sellerEmail: 'diniduravishka649@gmail.com', rating: 5.0 },
-        { title: 'Minimalist Genuine Leather Wallet', price: 2500, category: 'Fashion', image: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=500', sellerEmail: 'Maheshi@example.com', rating: 4.5 },
-        { title: 'Stainless Steel Insulated Water Bottle', price: 3200, category: 'Home & Living', image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=500', sellerEmail: 'diniduravishka649@gmail.com', rating: 4.7 }
+        { title: 'AirPods Pro', price: 49990, category: 'Mobiles', image: 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=500', sellerEmail: 'diniduravishka649@gmail.com', rating: 4.8, reviewsCount: 120 },
+        { title: 'Samsung Galaxy A56', price: 89990, category: 'Mobiles', image: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=500', sellerEmail: 'diniduravishka649@gmail.com', rating: 4.7, reviewsCount: 98 },
+        { title: 'Nike Air Force 1', price: 34990, category: 'Fashion', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500', sellerEmail: 'Maheshi@example.com', rating: 4.6, reviewsCount: 77 },
+        { title: 'Laptop Backpack', price: 7990, category: 'Home & Living', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500', sellerEmail: 'diniduravishka649@gmail.com', rating: 4.5, reviewsCount: 60 },
+        { title: 'Smart Watch', price: 19990, category: 'Electronics', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500', sellerEmail: 'Maheshi@example.com', rating: 4.6, reviewsCount: 85 },
+        { title: 'Wireless Earphones', price: 12990, category: 'Electronics', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500', sellerEmail: 'diniduravishka649@gmail.com', rating: 4.5, reviewsCount: 72 }
       ]);
-      console.log('Initial mega products seeded successfully!');
+      console.log('Referenced purple theme products seeded successfully!');
     }
   } catch (err) {
     console.error('Error in database seeding:', err);
@@ -108,12 +96,7 @@ app.post('/api/register', async (req, res) => {
     if (existingUser) return res.status(400).json({ error: 'Email already registered!' });
    
     const assignedRole = (role === 'seller') ? 'seller' : 'buyer';
-    const newUser = new User({
-      name: name.trim(),
-      email: email.trim().toLowerCase(),
-      password: password.trim(),
-      role: assignedRole
-    });
+    const newUser = new User({ name: name.trim(), email: email.trim().toLowerCase(), password: password.trim(), role: assignedRole });
     await newUser.save();
     res.json({ success: true, message: 'Registration successful!' });
   } catch (err) {
@@ -127,10 +110,7 @@ app.post('/api/login', async (req, res) => {
     const passwordInput = req.body.password ? req.body.password.trim() : '';
    
     const user = await User.findOne({
-      $or: [
-        { email: loginInput.toLowerCase() },
-        { name: loginInput }
-      ],
+      $or: [{ email: loginInput.toLowerCase() }, { name: loginInput }],
       password: passwordInput
     });
    
@@ -178,25 +158,16 @@ app.get('/api/admin/stats', async (req, res) => {
     const buyerCount = await User.countDocuments({ role: 'buyer' });
     const sellerCount = await User.countDocuments({ role: 'seller' });
     const adminCount = await User.countDocuments({ role: 'admin' });
-   
     const products = await Product.find({});
     const orders = await Order.find({});
 
-    res.json({
-      totalUsers,
-      buyerCount,
-      sellerCount,
-      adminCount,
-      productCount: products.length,
-      products,
-      orders
-    });
+    res.json({ totalUsers, buyerCount, sellerCount, adminCount, productCount: products.length, products, orders });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch stats' });
   }
 });
 
-// --- FRONTEND UI ---
+// --- FRONTEND UI (Purple Theme corresponding to reference layout) ---
 app.get('/', (req, res) => {
   res.send(`
     <!DOCTYPE html>
@@ -204,78 +175,91 @@ app.get('/', (req, res) => {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>KADEE.LK - Sri Lanka's Mega Marketplace</title>
+        <title>KADEE.LK - Online Marketplace</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
-            body { font-family: 'Poppins', sans-serif; }
+            body { font-family: 'Poppins', sans-serif; background-color: #5c35b1; color: #fff; }
         </style>
     </head>
-    <body class="bg-gray-100 text-gray-800">
+    <body class="bg-[#5c35b1] text-white">
 
-        <!-- Top Announcement Bar -->
-        <div class="bg-gradient-to-r from-orange-600 via-amber-600 to-orange-500 text-white text-xs py-2 px-6 flex justify-between items-center shadow-inner">
-            <div class="flex items-center gap-2">
-                <span class="bg-yellow-400 text-orange-950 px-2 py-0.5 rounded font-extrabold animate-pulse">MEGA SALE</span>
-                <span>🔥 දිවයින පුරා බෙදාහැරීම සහ PayHere / COD පහසුකම් සමඟ!</span>
+        <!-- Top Header Bar -->
+        <div class="bg-[#472691] text-xs py-2 px-6 flex justify-between items-center border-b border-purple-800">
+            <div class="flex items-center space-x-6">
+                <span><i class="fa-solid fa-phone text-purple-300 mr-1"></i> +94 77 123 4567</span>
+                <span><i class="fa-solid fa-envelope text-purple-300 mr-1"></i> info@kadee.lk</span>
             </div>
             <div class="flex space-x-6 items-center font-medium">
-                <span id="userDisplay" class="text-yellow-200"></span>
-                <button id="authBtn" onclick="openAuthModal()" class="bg-white text-orange-600 px-3 py-1 rounded-full font-bold hover:bg-yellow-300 hover:text-orange-900 transition shadow">Login / Register</button>
-                <button id="logoutBtn" onclick="logout()" class="hidden bg-red-600 text-white px-3 py-1 rounded-full font-bold hover:bg-red-700 transition">Logout</button>
+                <span id="userDisplay" class="text-purple-200"></span>
+                <a href="#" onclick="alert('Tracking page simulation')" class="hover:text-purple-300">Track Order</a>
+                <span>|</span>
+                <a href="#" onclick="alert('Help & Support')" class="hover:text-purple-300">Help</a>
+                <span>|</span>
+                <a href="#" onclick="alert('About us')" class="hover:text-purple-300">About Us</a>
             </div>
         </div>
 
-        <!-- Sticky Mega Header -->
-        <header id="mainHeader" class="bg-orange-500 text-white shadow-lg sticky top-0 z-50">
-            <div class="container mx-auto px-6 py-3 flex items-center justify-between gap-4">
-                <a href="/" class="text-3xl font-black tracking-wider flex items-center gap-2 drop-shadow">
-                    <div class="bg-white text-orange-600 p-2 rounded-xl shadow"><i class="fa-solid fa-store"></i></div>
-                    KADEE<span class="text-yellow-300">.LK</span>
+        <!-- Main Header -->
+        <header id="mainHeader" class="bg-[#5c35b1] py-4 shadow-md sticky top-0 z-50">
+            <div class="container mx-auto px-6 flex items-center justify-between gap-4">
+                <a href="/" class="text-3xl font-black tracking-wider flex items-center gap-2">
+                    <div class="bg-white text-[#5c35b1] p-2 rounded-xl shadow"><i class="fa-solid fa-store"></i></div>
+                    KADEE<span class="text-purple-300">.LK</span>
                 </a>
                
-                <div class="flex-1 max-w-3xl relative hidden md:block" id="searchBarContainer">
-                    <input type="search" id="searchInput" autocomplete="off" placeholder="Search for products, brands and categories in KADEE.LK..." class="w-full py-3 px-5 rounded-l-xl text-gray-800 focus:outline-none shadow-inner font-medium">
-                    <button onclick="searchProducts()" class="absolute right-0 top-0 bg-yellow-400 text-orange-950 px-8 py-3 rounded-r-xl font-extrabold hover:bg-yellow-300 transition shadow">
+                <div class="flex-1 max-w-2xl relative hidden md:block" id="searchBarContainer">
+                    <input type="search" id="searchInput" autocomplete="off" placeholder="Search for products..." class="w-full py-3 px-5 rounded-l-xl text-gray-800 focus:outline-none shadow-inner font-medium">
+                    <button onclick="searchProducts()" class="absolute right-0 top-0 bg-[#7c4dff] text-white px-8 py-3 rounded-r-xl font-extrabold hover:bg-[#6c3ef8] transition shadow">
                         <i class="fa-solid fa-search"></i>
                     </button>
                 </div>
 
-                <div class="flex items-center space-x-4">
-                    <button id="adminDashboardBtn" onclick="openAdminModal()" class="hidden bg-purple-700 hover:bg-purple-800 text-white px-4 py-2 rounded-xl font-bold text-sm shadow transition flex items-center gap-2">
+                <div class="flex items-center space-x-6">
+                    <button id="adminDashboardBtn" onclick="openAdminModal()" class="hidden bg-purple-900 hover:bg-purple-950 text-white px-4 py-2 rounded-xl font-bold text-sm shadow transition flex items-center gap-2 border border-purple-400">
                         <i class="fa-solid fa-gauge-high"></i> Admin Panel
                     </button>
-                    <button id="sellerDashboardBtn" onclick="openSellerModal()" class="hidden bg-yellow-300 hover:bg-yellow-400 text-orange-950 px-4 py-2 rounded-xl font-bold text-sm shadow transition flex items-center gap-2">
+                    <button id="sellerDashboardBtn" onclick="openSellerModal()" class="hidden bg-amber-500 hover:bg-amber-600 text-purple-950 px-4 py-2 rounded-xl font-bold text-sm shadow transition flex items-center gap-2">
                         <i class="fa-solid fa-box-archive"></i> Seller Hub
                     </button>
-                    <div id="cartIconWrapper" class="relative cursor-pointer flex items-center gap-2 bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded-xl transition shadow" onclick="toggleCart()">
+                    <button id="authBtn" onclick="openAuthModal()" class="flex items-center gap-2 hover:text-purple-300 font-semibold">
+                        <i class="fa-solid fa-user text-lg"></i> Login / Register
+                    </button>
+                    <button id="logoutBtn" onclick="logout()" class="hidden bg-red-600 text-white px-3 py-1.5 rounded-xl font-bold text-sm">Logout</button>
+                    <div id="cartIconWrapper" class="cursor-pointer flex items-center gap-2 bg-[#7c4dff] hover:bg-[#6c3ef8] px-4 py-2 rounded-xl transition shadow" onclick="toggleCart()">
                         <i class="fa-solid fa-cart-shopping text-xl"></i>
-                        <span id="cartCount" class="bg-yellow-300 text-orange-950 rounded-full px-2 py-0.5 text-xs font-black">0</span>
-                        <span class="hidden lg:inline font-bold">Cart</span>
+                        <span id="cartCount" class="bg-white text-[#5c35b1] rounded-full px-2 py-0.5 text-xs font-black">0</span>
+                        <span id="cartTotalText" class="font-bold text-sm">Rs. 0</span>
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- Categories Bar -->
-        <nav id="categoriesNav" class="bg-white shadow-sm border-b sticky top-[68px] z-40">
-            <div class="container mx-auto px-6 py-2.5 flex space-x-8 overflow-x-auto text-sm font-bold text-gray-700">
-                <button onclick="filterCategory('All')" class="hover:text-orange-600 whitespace-nowrap flex items-center gap-1.5"><i class="fa-solid fa-fire text-orange-500"></i> All Categories</button>
-                <button onclick="filterCategory('Electronics')" class="hover:text-orange-600 whitespace-nowrap flex items-center gap-1.5"><i class="fa-solid fa-laptop"></i> Electronics</button>
-                <button onclick="filterCategory('Fashion')" class="hover:text-orange-600 whitespace-nowrap flex items-center gap-1.5"><i class="fa-solid fa-shirt"></i> Fashion & Clothing</button>
-                <button onclick="filterCategory('Home & Living')" class="hover:text-orange-600 whitespace-nowrap flex items-center gap-1.5"><i class="fa-solid fa-house-chimney"></i> Home & Living</button>
-                <button onclick="filterCategory('Beauty')" class="hover:text-orange-600 whitespace-nowrap flex items-center gap-1.5"><i class="fa-solid fa-spa"></i> Beauty & Health</button>
+        <!-- Navigation Bar -->
+        <nav id="categoriesNav" class="bg-[#4e2d9b] border-t border-purple-700 shadow-sm sticky top-[76px] z-40">
+            <div class="container mx-auto px-6 py-3 flex items-center justify-between overflow-x-auto text-sm font-bold text-purple-200">
+                <div class="flex space-x-8 items-center">
+                    <button onclick="filterCategory('All')" class="bg-[#7c4dff] text-white px-4 py-2 rounded-xl flex items-center gap-2 shadow"><i class="fa-solid fa-bars"></i> All Categories</button>
+                    <button onclick="filterCategory('Home')" class="hover:text-white flex items-center gap-1"><i class="fa-solid fa-house"></i> Home</button>
+                    <div class="relative group cursor-pointer">
+                        <span class="hover:text-white flex items-center gap-1">Categories <i class="fa-solid fa-chevron-down text-xs"></i></span>
+                    </div>
+                    <button onclick="filterCategory('Deals')" class="hover:text-white flex items-center gap-1"><i class="fa-solid fa-tag"></i> Deals</button>
+                    <button onclick="filterCategory('Sellers')" class="hover:text-white flex items-center gap-1"><i class="fa-solid fa-store"></i> Sellers</button>
+                    <button onclick="filterCategory('Orders')" class="hover:text-white flex items-center gap-1"><i class="fa-solid fa-box"></i> Orders</button>
+                    <button onclick="filterCategory('Contact')" class="hover:text-white flex items-center gap-1"><i class="fa-solid fa-envelope"></i> Contact</button>
+                </div>
             </div>
         </nav>
 
         <!-- Admin Direct Full-Screen Dashboard (Shown immediately when Admin logs in) -->
-        <div id="adminDirectDashboard" class="hidden container mx-auto px-6 my-8">
-            <div class="bg-white p-8 rounded-3xl shadow-2xl border border-purple-100">
+        <div id="adminDirectDashboard" class="hidden container mx-auto px-6 my-8 text-gray-900">
+            <div class="bg-white p-8 rounded-3xl shadow-2xl border border-purple-200">
                 <div class="flex justify-between items-center mb-6 pb-4 border-b">
-                    <h3 class="text-3xl font-black text-purple-700 flex items-center gap-3"><i class="fa-solid fa-shield-halved"></i> KADEE.LK Master Admin Control Center</h3>
+                    <h3 class="text-3xl font-black text-[#5c35b1] flex items-center gap-3"><i class="fa-solid fa-shield-halved"></i> KADEE.LK Master Admin Control Center</h3>
                     <div class="flex items-center gap-3">
-                        <span class="bg-purple-100 text-purple-700 px-4 py-1.5 rounded-full font-bold text-xs">🔒 Biometric & Face ID Secured</span>
+                        <span class="bg-purple-100 text-[#5c35b1] px-4 py-1.5 rounded-full font-bold text-xs">🔒 Biometric & Face ID Secured</span>
                         <button onclick="logout()" class="bg-red-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-red-700 transition">Logout Admin</button>
                     </div>
                 </div>
@@ -284,7 +268,7 @@ app.get('/', (req, res) => {
                 <div class="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-8">
                     <div class="bg-purple-50 p-6 rounded-2xl border border-purple-100 text-center shadow-sm">
                         <h4 class="text-gray-600 font-semibold text-xs uppercase">Total Users</h4>
-                        <p id="directAdminTotalUsers" class="text-4xl font-black text-purple-700 mt-2">0</p>
+                        <p id="directAdminTotalUsers" class="text-4xl font-black text-[#5c35b1] mt-2">0</p>
                     </div>
                     <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100 text-center shadow-sm">
                         <h4 class="text-gray-600 font-semibold text-xs uppercase">Total Buyers</h4>
@@ -302,7 +286,7 @@ app.get('/', (req, res) => {
 
                 <!-- Growth Analytics Bar Charts -->
                 <div class="bg-gray-50 p-8 rounded-2xl border border-gray-200 mb-8 shadow-inner">
-                    <h4 class="font-black text-lg mb-6 text-gray-900 flex items-center gap-2"><i class="fa-solid fa-chart-bar text-purple-600"></i> Marketplace Registration Growth Bar Charts</h4>
+                    <h4 class="font-black text-lg mb-6 text-gray-900 flex items-center gap-2"><i class="fa-solid fa-chart-bar text-[#5c35b1]"></i> Marketplace Registration Growth Bar Charts</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div class="bg-white p-6 rounded-xl border shadow-sm">
                             <div class="flex justify-between font-bold text-sm text-gray-700 mb-2">
@@ -326,82 +310,157 @@ app.get('/', (req, res) => {
                 </div>
 
                 <!-- Recent Customer Orders -->
-                <h4 class="font-black text-xl mb-4 text-gray-900 flex items-center gap-2"><i class="fa-solid fa-receipt text-green-600"></i> Recent Customer Orders (PayHere & COD)</h4>
+                <h4 class="font-black text-xl mb-4 text-gray-900 flex items-center gap-2"><i class="fa-solid fa-receipt text-green-600"></i> Recent Customer Orders</h4>
                 <div id="directAdminOrdersList" class="space-y-3 text-sm">
                     <p class="text-gray-400">Loading orders...</p>
                 </div>
             </div>
         </div>
 
-        <!-- Hero Banner -->
-        <div id="heroBanner" class="container mx-auto px-6 mt-6">
-            <div class="bg-gradient-to-r from-gray-900 via-orange-900 to-orange-600 rounded-2xl p-8 md:p-12 text-white shadow-2xl flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
-                <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl">🛍️</div>
-                <div class="z-10 max-w-xl">
-                    <span class="bg-yellow-400 text-orange-950 text-xs px-3 py-1 rounded-full font-black uppercase tracking-wider">Sri Lanka's #1 Marketplace</span>
-                    <h1 class="text-3xl md:text-5xl font-black mt-3 mb-4 leading-tight">Shop Smart, Live Better with KADEE.LK</h1>
-                    <p class="text-gray-200 mb-6 font-light">Experience lightning-fast delivery, secured PayHere online checkout, and trusted local vendors all in one mega platform.</p>
-                    <div class="flex gap-4">
-                        <button onclick="window.scrollTo({top: 600, behavior: 'smooth'})" class="bg-yellow-400 text-orange-950 font-extrabold px-8 py-3 rounded-xl shadow-lg hover:bg-yellow-300 transition">Start Shopping</button>
-                        <button onclick="openAuthModal()" class="border-2 border-white text-white font-bold px-6 py-3 rounded-xl hover:bg-white hover:text-gray-900 transition">Join as Seller</button>
-                    </div>
+        <!-- Hero Section matching the layout -->
+        <div id="heroBanner" class="container mx-auto px-6 mt-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="max-w-xl">
+                    <h1 class="text-4xl md:text-5xl font-black mb-3">Welcome to <br><span class="text-purple-300">KADEE.LK</span></h1>
+                    <p class="text-xl font-bold mb-2">Your One-Stop Online Marketplace</p>
+                    <p class="text-purple-200 text-sm mb-6">Shop from thousands of products with trust and convenience.</p>
+                    <button onclick="window.scrollTo({top: 600, behavior: 'smooth'})" class="bg-[#7c4dff] text-white font-extrabold px-8 py-3.5 rounded-2xl shadow-xl hover:bg-[#6c3ef8] transition flex items-center gap-2">
+                        Shop Now <i class="fa-solid fa-arrow-right"></i>
+                    </button>
                 </div>
-                <div class="mt-8 md:mt-0 z-10 text-center bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20 shadow-xl">
-                    <div class="text-yellow-300 font-black text-2xl">🔥 FLASH SALE</div>
-                    <p class="text-sm text-gray-200 mt-1">Up to 60% OFF on Top Electronics</p>
-                    <div class="mt-4 flex gap-2 justify-center font-mono text-lg font-bold">
-                        <span class="bg-black/50 px-3 py-1 rounded">08</span>:
-                        <span class="bg-black/50 px-3 py-1 rounded">45</span>:
-                        <span class="bg-black/50 px-3 py-1 rounded">22</span>
+                <!-- Trust Badges on the right side -->
+                <div class="mt-8 md:mt-0 flex flex-col space-y-4">
+                    <div class="bg-[#4e2d9b] px-6 py-3.5 rounded-full flex items-center gap-4 shadow-lg border border-purple-600">
+                        <div class="bg-[#7c4dff] text-white w-7 h-7 rounded-full flex items-center justify-center"><i class="fa-solid fa-check text-xs"></i></div>
+                        <span class="font-bold text-sm">Secure Payment</span>
+                    </div>
+                    <div class="bg-[#4e2d9b] px-6 py-3.5 rounded-full flex items-center gap-4 shadow-lg border border-purple-600">
+                        <div class="bg-[#7c4dff] text-white w-7 h-7 rounded-full flex items-center justify-center"><i class="fa-solid fa-check text-xs"></i></div>
+                        <span class="font-bold text-sm">Fast Delivery</span>
+                    </div>
+                    <div class="bg-[#4e2d9b] px-6 py-3.5 rounded-full flex items-center gap-4 shadow-lg border border-purple-600">
+                        <div class="bg-[#7c4dff] text-white w-7 h-7 rounded-full flex items-center justify-center"><i class="fa-solid fa-check text-xs"></i></div>
+                        <span class="font-bold text-sm">Easy Returns</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Dynamic Marketplace Info Banner for Logged Users -->
-        <div id="roleInfoBanner" class="container mx-auto px-6 mt-6 hidden">
-            <div id="buyerBanner" class="hidden bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-6 rounded-2xl shadow-lg flex items-center justify-between">
-                <div>
-                    <h3 class="text-xl font-black flex items-center gap-2"><i class="fa-solid fa-bag-shopping"></i> Welcome to Your Buyer Hub!</h3>
-                    <p class="text-sm text-blue-100 mt-1">Enjoy lightning-fast islandwide delivery, verified local sellers, secure PayHere payments, and 24/7 buyer protection on KADEE.LK.</p>
+        <!-- Categories Icons Row -->
+        <div id="categoryIconsRow" class="container mx-auto px-6 my-10">
+            <div class="bg-[#4e2d9b]/60 backdrop-blur-md p-6 rounded-3xl grid grid-cols-3 sm:grid-cols-5 md:grid-cols-10 gap-4 text-center border border-purple-700">
+                <div onclick="filterCategory('Mobiles')" class="cursor-pointer group">
+                    <div class="bg-white/10 group-hover:bg-[#7c4dff] p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-mobile-screen text-xl text-purple-200 group-hover:text-white"></i></div>
+                    <span class="text-xs font-semibold">Mobiles</span>
                 </div>
-                <span class="bg-yellow-400 text-blue-950 px-4 py-2 rounded-xl font-extrabold text-sm shadow">VIP Buyer</span>
-            </div>
-            <div id="sellerBanner" class="hidden bg-gradient-to-r from-amber-600 to-orange-700 text-white p-6 rounded-2xl shadow-lg flex items-center justify-between">
-                <div>
-                    <h3 class="text-xl font-black flex items-center gap-2"><i class="fa-solid fa-store"></i> Welcome to Seller Hub & Vendor Dashboard!</h3>
-                    <p class="text-sm text-amber-100 mt-1">Manage your inventory, publish trending products instantly to thousands of Sri Lankan buyers, and track your sales performance in real-time.</p>
+                <div onclick="filterCategory('Laptops')" class="cursor-pointer group">
+                    <div class="bg-white/10 group-hover:bg-[#7c4dff] p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-laptop text-xl text-purple-200 group-hover:text-white"></i></div>
+                    <span class="text-xs font-semibold">Laptops</span>
                 </div>
-                <button onclick="openSellerModal()" class="bg-white text-orange-950 px-4 py-2 rounded-xl font-extrabold text-sm shadow hover:bg-yellow-300 transition">Publish Product</button>
+                <div onclick="filterCategory('Electronics')" class="cursor-pointer group">
+                    <div class="bg-white/10 group-hover:bg-[#7c4dff] p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-plug text-xl text-purple-200 group-hover:text-white"></i></div>
+                    <span class="text-xs font-semibold">Electronics</span>
+                </div>
+                <div onclick="filterCategory('Fashion')" class="cursor-pointer group">
+                    <div class="bg-white/10 group-hover:bg-[#7c4dff] p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-shirt text-xl text-purple-200 group-hover:text-white"></i></div>
+                    <span class="text-xs font-semibold">Fashion</span>
+                </div>
+                <div onclick="filterCategory('Home')" class="cursor-pointer group">
+                    <div class="bg-white/10 group-hover:bg-[#7c4dff] p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-house text-xl text-purple-200 group-hover:text-white"></i></div>
+                    <span class="text-xs font-semibold">Home & Living</span>
+                </div>
+                <div onclick="filterCategory('Beauty')" class="cursor-pointer group">
+                    <div class="bg-white/10 group-hover:bg-[#7c4dff] p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-spray-can-sparkles text-xl text-purple-200 group-hover:text-white"></i></div>
+                    <span class="text-xs font-semibold">Beauty</span>
+                </div>
+                <div onclick="filterCategory('Sports')" class="cursor-pointer group">
+                    <div class="bg-white/10 group-hover:bg-[#7c4dff] p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-futbol text-xl text-purple-200 group-hover:text-white"></i></div>
+                    <span class="text-xs font-semibold">Sports</span>
+                </div>
+                <div onclick="filterCategory('Toys')" class="cursor-pointer group">
+                    <div class="bg-white/10 group-hover:bg-[#7c4dff] p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-gamepad text-xl text-purple-200 group-hover:text-white"></i></div>
+                    <span class="text-xs font-semibold">Toys</span>
+                </div>
+                <div onclick="filterCategory('Books')" class="cursor-pointer group">
+                    <div class="bg-white/10 group-hover:bg-[#7c4dff] p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-book text-xl text-purple-200 group-hover:text-white"></i></div>
+                    <span class="text-xs font-semibold">Books</span>
+                </div>
+                <div onclick="filterCategory('All')" class="cursor-pointer group">
+                    <div class="bg-white/10 group-hover:bg-[#7c4dff] p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-ellipsis text-xl text-purple-200 group-hover:text-white"></i></div>
+                    <span class="text-xs font-semibold">More</span>
+                </div>
             </div>
         </div>
 
-        <!-- Main Product Grid -->
+        <!-- Main Product Section -->
         <main id="mainProductSection" class="container mx-auto px-6 my-10">
-            <div class="flex justify-between items-center mb-6 border-b pb-3">
-                <h2 class="text-2xl font-black text-gray-900 flex items-center gap-2"><i class="fa-solid fa-bolt text-orange-500"></i> Flash Sale & Trending Items</h2>
-                <span class="text-sm font-semibold text-gray-500">Showing curated mega collection</span>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-star text-yellow-400"></i> Featured Products</h2>
+                <button onclick="filterCategory('All')" class="text-sm font-semibold text-purple-200 hover:text-white flex items-center gap-1">View All <i class="fa-solid fa-arrow-right"></i></button>
             </div>
            
-            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <div class="text-center col-span-full py-16 text-gray-400 font-medium">Loading mega marketplace...</div>
+            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div class="text-center col-span-full py-16 text-purple-200 font-medium">Loading products...</div>
             </div>
         </main>
 
+        <!-- Footer matching layout -->
+        <footer class="bg-[#422387] pt-12 pb-6 border-t border-purple-800 mt-16 text-sm">
+            <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <a href="/" class="text-2xl font-black tracking-wider flex items-center gap-2 mb-4">
+                        <div class="bg-white text-[#5c35b1] p-1.5 rounded-lg shadow"><i class="fa-solid fa-store"></i></div>
+                        KADEE<span class="text-purple-300">.LK</span>
+                    </a>
+                    <p class="text-purple-200 text-xs leading-relaxed">Shop Smart... Live Better...</p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4 text-white">Quick Links</h4>
+                    <ul class="space-y-2 text-purple-200 text-xs">
+                        <li><a href="#" class="hover:text-white"><i class="fa-solid fa-house mr-1"></i> Home</a></li>
+                        <li><a href="#" class="hover:text-white"><i class="fa-solid fa-bars mr-1"></i> Categories</a></li>
+                        <li><a href="#" class="hover:text-white"><i class="fa-solid fa-truck mr-1"></i> Track Order</a></li>
+                        <li><a href="#" class="hover:text-white"><i class="fa-solid fa-envelope mr-1"></i> Contact Us</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4 text-white">Customer Support</h4>
+                    <ul class="space-y-2 text-purple-200 text-xs">
+                        <li><i class="fa-solid fa-phone mr-1"></i> +94 77 123 4567</li>
+                        <li><i class="fa-solid fa-envelope mr-1"></i> info@kadee.lk</li>
+                        <li><i class="fa-solid fa-clock mr-1"></i> Mon - Sat: 8.00 AM - 8.00 PM</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4 text-white">Follow Us</h4>
+                    <div class="flex space-x-3">
+                        <a href="#" class="w-8 h-8 bg-[#5c35b1] rounded-full flex items-center justify-center hover:bg-[#7c4dff] transition"><i class="fa-brands fa-facebook-f text-xs"></i></a>
+                        <a href="#" class="w-8 h-8 bg-[#5c35b1] rounded-full flex items-center justify-center hover:bg-[#7c4dff] transition"><i class="fa-brands fa-instagram text-xs"></i></a>
+                        <a href="#" class="w-8 h-8 bg-[#5c35b1] rounded-full flex items-center justify-center hover:bg-[#7c4dff] transition"><i class="fa-brands fa-whatsapp text-xs"></i></a>
+                        <a href="#" class="w-8 h-8 bg-[#5c35b1] rounded-full flex items-center justify-center hover:bg-[#7c4dff] transition"><i class="fa-brands fa-tiktok text-xs"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="container mx-auto px-6 pt-6 border-t border-purple-800 flex flex-col sm:flex-row justify-between items-center text-xs text-purple-300">
+                <p>&copy; 2026 KADEE.LK. All rights reserved.</p>
+                <p class="mt-2 sm:mt-0 flex items-center gap-1">Powered by <i class="fa-solid fa-heart text-red-500"></i> KADEE.LK</p>
+            </div>
+        </footer>
+
         <!-- Auth Modal -->
-        <div id="authModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex justify-center items-center p-4">
-            <div class="bg-white p-8 rounded-3xl w-full max-w-md shadow-2xl relative transform transition-all">
+        <div id="authModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex justify-center items-center p-4 text-gray-900">
+            <div class="bg-white p-8 rounded-3xl w-full max-w-md shadow-2xl relative">
                 <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-black font-bold text-2xl">&times;</button>
-                <h3 id="authTitle" class="text-2xl font-black mb-6 text-gray-900">Login to KADEE.LK</h3>
+                <h3 id="authTitle" class="text-2xl font-black mb-6 text-[#5c35b1]">Login to KADEE.LK</h3>
                
                 <div id="registerFields" class="hidden space-y-4 mb-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Full Name</label>
-                        <input type="text" id="regName" placeholder="Dinidu ravishka" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none">
+                        <input type="text" id="regName" placeholder="Dinidu ravishka" class="w-full p-3 border rounded-xl outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Account Role</label>
-                        <select id="regRole" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none font-medium">
+                        <select id="regRole" class="w-full p-3 border rounded-xl outline-none">
                             <option value="buyer">Buyer (Customer)</option>
                             <option value="seller">Seller (Vendor Hub)</option>
                         </select>
@@ -411,84 +470,52 @@ app.get('/', (req, res) => {
                 <div class="space-y-4 mb-6">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1" id="authLabelEmail">Username / Email Address</label>
-                        <input type="text" id="authEmail" autocomplete="username" placeholder="Dinidu ravishka" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none">
+                        <input type="text" id="authEmail" autocomplete="username" placeholder="Dinidu ravishka" class="w-full p-3 border rounded-xl outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Password</label>
-                        <input type="password" id="authPassword" autocomplete="current-password" placeholder="••••••••" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none">
+                        <input type="password" id="authPassword" autocomplete="current-password" placeholder="••••••••" class="w-full p-3 border rounded-xl outline-none">
                     </div>
                 </div>
-                <button onclick="handleAuthSubmit()" id="authSubmitBtn" class="w-full bg-orange-600 text-white py-3 rounded-xl font-bold hover:bg-orange-700 transition shadow-lg">Login</button>
+                <button onclick="handleAuthSubmit()" id="authSubmitBtn" class="w-full bg-[#7c4dff] text-white py-3 rounded-xl font-bold hover:bg-[#6c3ef8] transition shadow-lg">Login</button>
                 <p class="text-sm text-center mt-6 text-gray-600">
                     <span id="authToggleText">Don't have an account?</span>
-                    <button onclick="toggleAuthMode()" class="text-orange-600 font-extrabold underline ml-1">Register here</button>
+                    <button onclick="toggleAuthMode()" class="text-[#5c35b1] font-extrabold underline ml-1">Register here</button>
                 </p>
             </div>
         </div>
 
         <!-- Seller Hub Modal -->
-        <div id="sellerModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex justify-center items-center p-4">
+        <div id="sellerModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex justify-center items-center p-4 text-gray-900">
             <div class="bg-white p-8 rounded-3xl w-full max-w-md shadow-2xl relative">
                 <button onclick="openSellerModal()" class="absolute top-4 right-4 text-gray-400 hover:text-black font-bold text-2xl">&times;</button>
-                <h3 class="text-2xl font-black mb-6 text-orange-600 flex items-center gap-2"><i class="fa-solid fa-box-open"></i> Seller Hub</h3>
+                <h3 class="text-2xl font-black mb-6 text-[#5c35b1] flex items-center gap-2"><i class="fa-solid fa-box-open"></i> Seller Hub</h3>
                 <div class="space-y-4 mb-6">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Product Title</label>
-                        <input type="text" id="prodTitle" placeholder="e.g. Wireless Gaming Headset" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-orange-500">
+                        <input type="text" id="prodTitle" placeholder="e.g. AirPods Pro" class="w-full p-3 border rounded-xl outline-none">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-600 mb-1">Price (LKR)</label>
-                        <input type="number" id="prodPrice" placeholder="4500" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-orange-500">
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Price (Rs.)</label>
+                        <input type="number" id="prodPrice" placeholder="49990" class="w-full p-3 border rounded-xl outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Category</label>
-                        <input type="text" id="prodCategory" placeholder="Electronics / Fashion / Home" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-orange-500">
+                        <input type="text" id="prodCategory" placeholder="Mobiles / Laptops / Fashion" class="w-full p-3 border rounded-xl outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Image URL</label>
-                        <input type="text" id="prodImage" placeholder="https://images.unsplash.com/..." class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-orange-500">
+                        <input type="text" id="prodImage" placeholder="https://images.unsplash.com/..." class="w-full p-3 border rounded-xl outline-none">
                     </div>
                 </div>
-                <button onclick="addNewProduct()" class="w-full bg-orange-600 text-white py-3 rounded-xl font-bold hover:bg-orange-700 transition shadow-lg">Publish Product</button>
-            </div>
-        </div>
-
-        <!-- Admin Dashboard Modal (Fallback/Manual trigger if needed) -->
-        <div id="adminModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex justify-center items-center p-4">
-            <div class="bg-white p-8 rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl relative">
-                <button onclick="openAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-black font-bold text-2xl">&times;</button>
-                <h3 class="text-2xl font-black mb-6 text-purple-700 flex items-center gap-2"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard & Analytics</h3>
-               
-                <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-8">
-                    <div class="bg-purple-50 p-4 rounded-2xl border border-purple-100 text-center">
-                        <h4 class="text-gray-600 font-semibold text-xs uppercase">Total Users</h4>
-                        <p id="adminTotalUsers" class="text-3xl font-black text-purple-700 mt-1">0</p>
-                    </div>
-                    <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100 text-center">
-                        <h4 class="text-gray-600 font-semibold text-xs uppercase">Total Buyers</h4>
-                        <p id="adminBuyerCount" class="text-3xl font-black text-blue-700 mt-1">0</p>
-                    </div>
-                    <div class="bg-amber-50 p-4 rounded-2xl border border-amber-100 text-center">
-                        <h4 class="text-gray-600 font-semibold text-xs uppercase">Total Sellers</h4>
-                        <p id="adminSellerCount" class="text-3xl font-black text-amber-600 mt-1">0</p>
-                    </div>
-                    <div class="bg-orange-50 p-4 rounded-2xl border border-orange-100 text-center">
-                        <h4 class="text-gray-600 font-semibold text-xs uppercase">Total Products</h4>
-                        <p id="adminProdCount" class="text-3xl font-black text-orange-600 mt-1">0</p>
-                    </div>
-                </div>
-
-                <h4 class="font-bold text-lg mb-4 text-gray-900">Recent Customer Orders (PayHere & COD)</h4>
-                <div id="adminOrdersList" class="space-y-3 text-sm">
-                    <p class="text-gray-400">Loading orders...</p>
-                </div>
+                <button onclick="addNewProduct()" class="w-full bg-[#7c4dff] text-white py-3 rounded-xl font-bold hover:bg-[#6c3ef8] transition shadow-lg">Publish Product</button>
             </div>
         </div>
 
         <!-- Cart Sidebar -->
-        <div id="cartModal" class="fixed right-0 top-0 w-full max-w-md h-full bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 p-6 flex flex-col">
+        <div id="cartModal" class="fixed right-0 top-0 w-full max-w-md h-full bg-white text-gray-900 shadow-2xl z-50 transform translate-x-full transition-transform duration-300 p-6 flex flex-col">
             <div class="flex justify-between items-center border-b pb-4">
-                <h3 class="text-xl font-black text-gray-900 flex items-center gap-2"><i class="fa-solid fa-cart-shopping text-orange-600"></i> Shopping Cart</h3>
+                <h3 class="text-xl font-black text-[#5c35b1] flex items-center gap-2"><i class="fa-solid fa-cart-shopping"></i> Shopping Cart</h3>
                 <button onclick="toggleCart()" class="text-gray-400 hover:text-black font-bold text-2xl">&times;</button>
             </div>
             <div id="cartItems" class="flex-1 overflow-y-auto py-4 space-y-4">
@@ -497,16 +524,16 @@ app.get('/', (req, res) => {
             <div class="border-t pt-4 space-y-4">
                 <div class="flex justify-between font-black text-xl">
                     <span>Subtotal:</span>
-                    <span id="cartTotal" class="text-orange-600">LKR 0</span>
+                    <span id="cartTotal" class="text-[#5c35b1]">Rs. 0</span>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-600 mb-1">Select Checkout Payment Method:</label>
-                    <select id="paymentMethod" class="w-full p-3 border rounded-xl text-sm font-semibold focus:ring-2 focus:ring-orange-500 outline-none">
-                        <option value="PayHere">PayHere Secured Online Gateway</option>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Select Payment Method:</label>
+                    <select id="paymentMethod" class="w-full p-3 border rounded-xl text-sm font-semibold outline-none">
+                        <option value="PayHere">Secure Online Payment</option>
                         <option value="COD">Cash on Delivery (COD)</option>
                     </select>
                 </div>
-                <button onclick="checkout()" class="w-full bg-orange-600 text-white py-3.5 rounded-xl font-black hover:bg-orange-700 transition shadow-lg">Proceed to Checkout</button>
+                <button onclick="checkout()" class="w-full bg-[#7c4dff] text-white py-3.5 rounded-xl font-black hover:bg-[#6c3ef8] transition shadow-lg">Proceed to Checkout</button>
             </div>
         </div>
 
@@ -520,21 +547,14 @@ app.get('/', (req, res) => {
             async function updateUIState() {
                 const adminBtn = document.getElementById('adminDashboardBtn');
                 const sellerBtn = document.getElementById('sellerDashboardBtn');
-                const roleBanner = document.getElementById('roleInfoBanner');
-                const buyerBanner = document.getElementById('buyerBanner');
-                const sellerBanner = document.getElementById('sellerBanner');
                 const directAdminDashboard = document.getElementById('adminDirectDashboard');
                 const heroBanner = document.getElementById('heroBanner');
                 const mainProductSection = document.getElementById('mainProductSection');
                 const categoriesNav = document.getElementById('categoriesNav');
-                const searchBarContainer = document.getElementById('searchBarContainer');
-                const cartIconWrapper = document.getElementById('cartIconWrapper');
+                const categoryIconsRow = document.getElementById('categoryIconsRow');
                
                 adminBtn.classList.add('hidden');
                 sellerBtn.classList.add('hidden');
-                roleBanner.classList.add('hidden');
-                buyerBanner.classList.add('hidden');
-                sellerBanner.classList.add('hidden');
                 directAdminDashboard.classList.add('hidden');
 
                 if (currentUser) {
@@ -543,21 +563,17 @@ app.get('/', (req, res) => {
                     document.getElementById('logoutBtn').classList.remove('hidden');
 
                     if (currentUser.role === 'admin') {
-                        // Hide regular marketplace sections and display full Admin Direct Dashboard
                         heroBanner.classList.add('hidden');
                         mainProductSection.classList.add('hidden');
                         categoriesNav.classList.add('hidden');
-                        searchBarContainer.classList.add('hidden');
-                        cartIconWrapper.classList.add('hidden');
+                        categoryIconsRow.classList.add('hidden');
+                        document.getElementById('searchBarContainer').classList.add('hidden');
+                        document.getElementById('cartIconWrapper').classList.add('hidden');
                         directAdminDashboard.classList.remove('hidden');
                         loadAdminDirectStats();
                     } else {
-                        roleBanner.classList.remove('hidden');
-                        if (currentUser.role === 'buyer') {
-                            buyerBanner.classList.remove('hidden');
-                        } else if (currentUser.role === 'seller') {
+                        if (currentUser.role === 'seller') {
                             sellerBtn.classList.remove('hidden');
-                            sellerBanner.classList.remove('hidden');
                         }
                     }
                 } else {
@@ -594,10 +610,10 @@ app.get('/', (req, res) => {
                         ordersList.innerHTML = '<p class="text-gray-400">No orders received yet.</p>';
                     } else {
                         ordersList.innerHTML = stats.orders.map(o => \`
-                            <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex justify-between items-center shadow-sm">
+                            <div class="bg-gray-50 p-4 rounded-2xl border flex justify-between items-center shadow-sm">
                                 <div>
-                                    <span class="font-black text-xs text-purple-700">Buyer: \${o.buyerEmail}</span>
-                                    <p class="text-xs text-gray-600 mt-0.5">Total: <b>LKR \${o.totalAmount.toLocaleString()}</b> via \${o.paymentMethod}</p>
+                                    <span class="font-black text-xs text-[#5c35b1]">Buyer: \${o.buyerEmail}</span>
+                                    <p class="text-xs text-gray-600 mt-0.5">Total: <b>Rs. \${o.totalAmount.toLocaleString()}</b> via \${o.paymentMethod}</p>
                                 </div>
                                 <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-extrabold">\${o.status}</span>
                             </div>
@@ -623,29 +639,25 @@ app.get('/', (req, res) => {
             function displayProducts(items) {
                 const grid = document.getElementById('productGrid');
                 if (!items || items.length === 0) {
-                    grid.innerHTML = '<p class="col-span-full text-center text-gray-400 py-12">No products available in this category.</p>';
+                    grid.innerHTML = '<p class="col-span-full text-center text-purple-200 py-12">No products available.</p>';
                     return;
                 }
                 grid.innerHTML = items.map(p => \`
-                    <div class="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 p-4 flex flex-col justify-between border border-gray-100 group">
+                    <div class="bg-white text-gray-900 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 p-3 flex flex-col justify-between border border-purple-100 group">
                         <div>
                             <div class="relative overflow-hidden rounded-xl mb-3 bg-gray-100">
-                                <img src="\${p.image}" alt="\${p.title}" class="w-full h-52 object-cover group-hover:scale-105 transition duration-300">
-                                <span class="absolute top-2 left-2 bg-orange-600 text-white text-[10px] uppercase font-black px-2.5 py-1 rounded-full shadow">\${p.category}</span>
+                                <img src="\${p.image}" alt="\${p.title}" class="w-full h-40 object-cover group-hover:scale-105 transition duration-300">
                             </div>
-                            <h3 class="font-bold text-gray-900 mt-2 text-sm md:text-base line-clamp-2">\${p.title}</h3>
-                            <div class="flex items-center gap-1 text-yellow-500 text-xs mt-1.5 font-semibold">
+                            <h3 class="font-bold text-gray-900 text-sm line-clamp-1">\${p.title}</h3>
+                            <div class="text-[#5c35b1] font-black text-base mt-1">Rs. \${p.price.toLocaleString()}</div>
+                            <div class="flex items-center gap-1 text-yellow-500 text-xs mt-1 font-semibold">
                                 <span>⭐ \${p.rating}</span>
-                                <span class="text-gray-400">(\${p.reviews ? p.reviews.length : 0} reviews)</span>
+                                <span class="text-gray-400">(\${p.reviewsCount || 75})</span>
                             </div>
                         </div>
-                        <div class="mt-4 pt-3 border-t border-gray-50 flex items-center justify-between">
-                            <div>
-                                <span class="text-[10px] text-gray-400 block font-medium">Price</span>
-                                <div class="text-orange-600 font-black text-lg">LKR \${p.price.toLocaleString()}</div>
-                            </div>
-                            <button onclick="addToCart('\${p._id}')" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow transition flex items-center gap-1.5">
-                                <i class="fa-solid fa-cart-plus"></i> Add
+                        <div class="mt-4 pt-3 border-t border-gray-100">
+                            <button onclick="addToCart('\${p._id}')" class="w-full bg-[#7c4dff] hover:bg-[#6c3ef8] text-white py-2 rounded-xl font-bold text-xs shadow transition flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-cart-plus"></i> Add to Cart
                             </button>
                         </div>
                     </div>
@@ -661,12 +673,7 @@ app.get('/', (req, res) => {
                 }
             }
 
-            function openAuthModal() {
-                document.getElementById('authEmail').value = '';
-                document.getElementById('authPassword').value = '';
-                document.getElementById('authModal').classList.remove('hidden');
-            }
-           
+            function openAuthModal() { document.getElementById('authModal').classList.remove('hidden'); }
             function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
            
             function toggleAuthMode() {
@@ -675,23 +682,12 @@ app.get('/', (req, res) => {
                 document.getElementById('registerFields').classList.toggle('hidden');
                 document.getElementById('authSubmitBtn').innerText = isRegisterMode ? 'Register Now' : 'Login';
                 document.getElementById('authToggleText').innerText = isRegisterMode ? 'Already have an account?' : "Don't have an account?";
-               
-                if (isRegisterMode) {
-                    document.getElementById('authLabelEmail').innerText = 'Email Address';
-                    document.getElementById('authEmail').placeholder = 'Maheshi@example.com';
-                } else {
-                    document.getElementById('authLabelEmail').innerText = 'Username / Email Address';
-                    document.getElementById('authEmail').placeholder = 'Dinidu ravishka';
-                }
-
-                document.getElementById('authEmail').value = '';
-                document.getElementById('authPassword').value = '';
             }
 
             async function handleAuthSubmit() {
                 const email = document.getElementById('authEmail').value.trim();
                 const password = document.getElementById('authPassword').value.trim();
-                if (!email || !password) { alert('Please enter username/email and password!'); return; }
+                if (!email || !password) { alert('Please enter email and password!'); return; }
 
                 if (isRegisterMode) {
                     const name = document.getElementById('regName').value.trim();
@@ -713,29 +709,17 @@ app.get('/', (req, res) => {
                     const data = await res.json();
                     if (data.success) {
                         const userObj = data.user;
-                       
-                        // If Admin, simulate Biometric / Face ID / Fingerprint verification for high security
                         if (userObj.role === 'admin') {
-                            if (window.PublicKeyCredential) {
-                                try {
-                                    alert('🔐 KADEE.LK Security: Please verify your Fingerprint or Face ID for Admin Access.');
-                                    // Simulated WebAuthn prompt or native confirmation
-                                } catch(e) {}
-                            }
                             const bioConfirm = confirm('🔒 Biometric Verification: Confirm Admin Face ID / Fingerprint Scan for ' + userObj.name + '?');
-                            if (!bioConfirm) {
-                                alert('Biometric verification cancelled. Login aborted.');
-                                return;
-                            }
+                            if (!bioConfirm) { alert('Biometric verification cancelled.'); return; }
                         }
-
                         currentUser = userObj;
                         localStorage.setItem('kadee_user', JSON.stringify(currentUser));
                         closeAuthModal();
                         updateUIState();
                         alert('Welcome back, ' + currentUser.name + '!');
                         window.location.reload();
-                    } else { alert(data.error || 'Invalid username/email or password!'); }
+                    } else { alert(data.error || 'Invalid login credentials!'); }
                 }
             }
 
@@ -769,7 +753,7 @@ app.get('/', (req, res) => {
                 });
                 const data = await res.json();
                 if (data.success) {
-                    alert('Product published successfully on KADEE.LK!');
+                    alert('Product published successfully!');
                     openSellerModal();
                     fetchProducts();
                 }
@@ -788,13 +772,14 @@ app.get('/', (req, res) => {
 
             function updateCartUI() {
                 document.getElementById('cartCount').innerText = cart.length;
+                let total = 0;
                 const container = document.getElementById('cartItems');
                 if (cart.length === 0) {
                     container.innerHTML = '<p class="text-gray-400 text-center py-8">Your cart is currently empty.</p>';
-                    document.getElementById('cartTotal').innerText = 'LKR 0';
+                    document.getElementById('cartTotal').innerText = 'Rs. 0';
+                    document.getElementById('cartTotalText').innerText = 'Rs. 0';
                     return;
                 }
-                let total = 0;
                 container.innerHTML = cart.map((item, index) => {
                     total += item.price;
                     return \`
@@ -803,21 +788,22 @@ app.get('/', (req, res) => {
                                 <img src="\${item.image}" class="w-12 h-12 object-cover rounded-lg">
                                 <div>
                                     <h4 class="font-bold text-sm line-clamp-1">\${item.title}</h4>
-                                    <span class="text-orange-600 font-extrabold text-xs">LKR \${item.price.toLocaleString()}</span>
+                                    <span class="text-[#5c35b1] font-extrabold text-xs">Rs. \${item.price.toLocaleString()}</span>
                                 </div>
                             </div>
-                            <button onclick="removeFromCart(\--index)" class="text-red-500 hover:text-red-700 p-2"><i class="fa-solid fa-trash"></i></button>
+                            <button onclick="removeFromCart(\--index)" class="text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     \`;
                 }).join('');
-                document.getElementById('cartTotal').innerText = 'LKR ' + total.toLocaleString();
+                document.getElementById('cartTotal').innerText = 'Rs. ' + total.toLocaleString();
+                document.getElementById('cartTotalText').innerText = 'Rs. ' + total.toLocaleString();
             }
 
             function removeFromCart(index) { cart.splice(index, 1); updateCartUI(); }
             function toggleCart() { document.getElementById('cartModal').classList.toggle('translate-x-full'); }
 
             async function checkout() {
-                if (!currentUser) { alert('Please login or register to complete your checkout!'); openAuthModal(); return; }
+                if (!currentUser) { alert('Please login to complete your checkout!'); openAuthModal(); return; }
                 if (cart.length === 0) { alert('Your cart is empty!'); return; }
                 const paymentMethod = document.getElementById('paymentMethod').value;
                 const totalAmount = cart.reduce((sum, item) => sum + item.price, 0);
@@ -829,16 +815,12 @@ app.get('/', (req, res) => {
                 });
                 const data = await res.json();
                 if (data.success) {
-                    if (paymentMethod === 'PayHere') {
-                        alert('Redirecting to PayHere secure payment gateway simulation... Order Successful!');
-                    } else {
-                        alert('Order placed successfully via Cash on Delivery (COD)!');
-                    }
+                    alert('Order placed successfully!');
                     cart = [];
                     updateCartUI();
                     toggleCart();
                 } else {
-                    alert('Checkout failed. Please try again.');
+                    alert('Checkout failed.');
                 }
             }
 
