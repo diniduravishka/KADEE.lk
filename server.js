@@ -167,7 +167,7 @@ app.get('/api/admin/stats', async (req, res) => {
   }
 });
 
-// --- FRONTEND UI (Black & Luxury Gold Theme) ---
+// --- FRONTEND UI (Luxury Black & Gold Theme with Shopping Cart & Carved Wave Accents) ---
 app.get('/', (req, res) => {
   res.send(`
     <!DOCTYPE html>
@@ -180,13 +180,20 @@ app.get('/', (req, res) => {
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
-            body { font-family: 'Poppins', sans-serif; background-color: #0b0b0b; color: #fff; }
+            body { font-family: 'Poppins', sans-serif; background-color: #0b0b0b; color: #fff; overflow-x: hidden; }
             .gold-text { color: #f3ba2f; }
             .gold-bg { background-color: #f3ba2f; }
             .gold-border { border-color: #f3ba2f; }
+            /* Luxury Curved Gold Wave Overlay */
+            .gold-curve-bg {
+                background: radial-gradient(circle at top right, rgba(243, 186, 47, 0.15), transparent 40%),
+                            radial-gradient(circle at bottom left, rgba(243, 186, 47, 0.1), transparent 50%),
+                            #0b0b0b;
+                position: relative;
+            }
         </style>
     </head>
-    <body class="bg-[#0b0b0b] text-white">
+    <body class="gold-curve-bg text-white">
 
         <!-- Top Header Bar -->
         <div class="bg-[#141414] text-xs py-2 px-6 flex justify-between items-center border-b border-zinc-800">
@@ -205,7 +212,7 @@ app.get('/', (req, res) => {
         </div>
 
         <!-- Main Header -->
-        <header id="mainHeader" class="bg-[#0b0b0b] py-4 shadow-md sticky top-0 z-50">
+        <header id="mainHeader" class="bg-[#0b0b0b]/90 backdrop-blur-md py-4 shadow-md sticky top-0 z-50 border-b border-zinc-800">
             <div class="container mx-auto px-6 flex items-center justify-between gap-4">
                 <a href="/" class="text-3xl font-black tracking-wider flex items-center gap-2">
                     <div class="bg-gradient-to-r from-amber-500 to-yellow-300 text-black p-2 rounded-xl shadow"><i class="fa-solid fa-store"></i></div>
@@ -277,7 +284,7 @@ app.get('/', (req, res) => {
                         <h4 class="text-gray-600 font-semibold text-xs uppercase">Total Buyers</h4>
                         <p id="directAdminBuyerCount" class="text-4xl font-black text-blue-700 mt-2">0</p>
                     </div>
-                    <div class="bg-amber-50 p-6 rounded-2xl border border-amber-100 text-center shadow-sm">
+                    <div class="bg-amber-50 p-6 rounded-2xl border border-amber-200 text-center shadow-sm">
                         <h4 class="text-gray-600 font-semibold text-xs uppercase">Total Sellers</h4>
                         <p id="directAdminSellerCount" class="text-4xl font-black text-amber-600 mt-2">0</p>
                     </div>
@@ -320,10 +327,10 @@ app.get('/', (req, res) => {
             </div>
         </div>
 
-        <!-- Hero Section matching luxury black/gold theme -->
-        <div id="heroBanner" class="container mx-auto px-6 mt-8">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <div class="max-w-xl">
+        <!-- Hero Section with Luxury Carved Wave Background matching target image -->
+        <div id="heroBanner" class="container mx-auto px-6 mt-8 relative">
+            <div class="flex flex-col md:flex-row justify-between items-center py-6">
+                <div class="max-w-xl z-10">
                     <h1 class="text-4xl md:text-5xl font-black mb-3">Welcome to <br><span class="gold-text">KADEE.LK</span></h1>
                     <p class="text-xl font-bold mb-2">Your One-Stop Online Marketplace</p>
                     <p class="text-zinc-400 text-sm mb-6">Shop from thousands of products with trust and convenience.</p>
@@ -331,19 +338,24 @@ app.get('/', (req, res) => {
                         Shop Now <i class="fa-solid fa-arrow-right"></i>
                     </button>
                 </div>
-                <!-- Trust Badges on the right side -->
-                <div class="mt-8 md:mt-0 flex flex-col space-y-4">
-                    <div class="bg-[#141414] px-6 py-3.5 rounded-full flex items-center gap-4 shadow-lg border border-zinc-800">
-                        <div class="gold-bg text-black w-7 h-7 rounded-full flex items-center justify-center"><i class="fa-solid fa-check text-xs"></i></div>
-                        <span class="font-bold text-sm">Secure Payment</span>
+                <!-- Featured Shopping Cart Illustration on the right with gold ambient curves -->
+                <div class="mt-8 md:mt-0 z-10 flex flex-col items-center">
+                    <div class="bg-[#141414]/80 backdrop-blur-md p-6 rounded-3xl border border-amber-500/30 shadow-2xl relative">
+                        <div class="absolute -top-3 -right-3 gold-bg text-black text-xs font-black px-3 py-1 rounded-full shadow">MEGA CART</div>
+                        <i class="fa-solid fa-cart-shopping text-7xl gold-text mb-4"></i>
+                        <p class="text-xs font-bold text-zinc-300">Fast Islandwide Checkout</p>
                     </div>
-                    <div class="bg-[#141414] px-6 py-3.5 rounded-full flex items-center gap-4 shadow-lg border border-zinc-800">
-                        <div class="gold-bg text-black w-7 h-7 rounded-full flex items-center justify-center"><i class="fa-solid fa-check text-xs"></i></div>
-                        <span class="font-bold text-sm">Fast Delivery</span>
-                    </div>
-                    <div class="bg-[#141414] px-6 py-3.5 rounded-full flex items-center gap-4 shadow-lg border border-zinc-800">
-                        <div class="gold-bg text-black w-7 h-7 rounded-full flex items-center justify-center"><i class="fa-solid fa-check text-xs"></i></div>
-                        <span class="font-bold text-sm">Easy Returns</span>
+                    <!-- Trust Badges below -->
+                    <div class="flex space-x-3 mt-6">
+                        <div class="bg-[#141414] px-4 py-2 rounded-full flex items-center gap-2 border border-zinc-800 text-xs">
+                            <i class="fa-solid fa-check gold-text"></i> Secure Payment
+                        </div>
+                        <div class="bg-[#141414] px-4 py-2 rounded-full flex items-center gap-2 border border-zinc-800 text-xs">
+                            <i class="fa-solid fa-check gold-text"></i> Fast Delivery
+                        </div>
+                        <div class="bg-[#141414] px-4 py-2 rounded-full flex items-center gap-2 border border-zinc-800 text-xs">
+                            <i class="fa-solid fa-check gold-text"></i> Easy Returns
+                        </div>
                     </div>
                 </div>
             </div>
@@ -351,7 +363,7 @@ app.get('/', (req, res) => {
 
         <!-- Categories Icons Row -->
         <div id="categoryIconsRow" class="container mx-auto px-6 my-10">
-            <div class="bg-[#141414] p-6 rounded-3xl grid grid-cols-3 sm:grid-cols-5 md:grid-cols-10 gap-4 text-center border border-zinc-800">
+            <div class="bg-[#141414] p-6 rounded-3xl grid grid-cols-3 sm:grid-cols-5 md:grid-cols-10 gap-4 text-center border border-zinc-800 shadow-xl">
                 <div onclick="filterCategory('Mobiles')" class="cursor-pointer group">
                     <div class="bg-white/5 group-hover:bg-[#f3ba2f] group-hover:text-black p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-mobile-screen text-xl gold-text group-hover:text-black"></i></div>
                     <span class="text-xs font-semibold">Mobiles</span>
@@ -450,7 +462,7 @@ app.get('/', (req, res) => {
             </div>
         </footer>
 
-        <!-- Auth Modal -->
+        <!-- Auth Modal with autofill disabled and Maheshi@example.gamil.com placeholder -->
         <div id="authModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex justify-center items-center p-4 text-gray-900">
             <div class="bg-white p-8 rounded-3xl w-full max-w-md shadow-2xl relative border border-amber-500">
                 <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-black font-bold text-2xl">&times;</button>
@@ -459,7 +471,7 @@ app.get('/', (req, res) => {
                 <div id="registerFields" class="hidden space-y-4 mb-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Full Name</label>
-                        <input type="text" id="regName" placeholder="Dinidu ravishka" class="w-full p-3 border rounded-xl outline-none">
+                        <input type="text" id="regName" autocomplete="off" placeholder="Dinidu ravishka" class="w-full p-3 border rounded-xl outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Account Role</label>
@@ -473,11 +485,11 @@ app.get('/', (req, res) => {
                 <div class="space-y-4 mb-6">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1" id="authLabelEmail">Username / Email Address</label>
-                        <input type="text" id="authEmail" autocomplete="username" placeholder="Dinidu ravishka" class="w-full p-3 border rounded-xl outline-none">
+                        <input type="text" id="authEmail" autocomplete="off" placeholder="Maheshi@example.gamil.com" class="w-full p-3 border rounded-xl outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Password</label>
-                        <input type="password" id="authPassword" autocomplete="current-password" placeholder="••••••••" class="w-full p-3 border rounded-xl outline-none">
+                        <input type="password" id="authPassword" autocomplete="new-password" placeholder="••••••••" class="w-full p-3 border rounded-xl outline-none">
                     </div>
                 </div>
                 <button onclick="handleAuthSubmit()" id="authSubmitBtn" class="w-full gold-bg text-black py-3 rounded-xl font-bold hover:opacity-90 transition shadow-lg">Login</button>
@@ -496,19 +508,19 @@ app.get('/', (req, res) => {
                 <div class="space-y-4 mb-6">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Product Title</label>
-                        <input type="text" id="prodTitle" placeholder="e.g. AirPods Pro" class="w-full p-3 border rounded-xl outline-none">
+                        <input type="text" id="prodTitle" autocomplete="off" placeholder="e.g. AirPods Pro" class="w-full p-3 border rounded-xl outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Price (Rs.)</label>
-                        <input type="number" id="prodPrice" placeholder="49990" class="w-full p-3 border rounded-xl outline-none">
+                        <input type="number" id="prodPrice" autocomplete="off" placeholder="49990" class="w-full p-3 border rounded-xl outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Category</label>
-                        <input type="text" id="prodCategory" placeholder="Mobiles / Laptops / Fashion" class="w-full p-3 border rounded-xl outline-none">
+                        <input type="text" id="prodCategory" autocomplete="off" placeholder="Mobiles / Laptops / Fashion" class="w-full p-3 border rounded-xl outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Image URL</label>
-                        <input type="text" id="prodImage" placeholder="https://images.unsplash.com/..." class="w-full p-3 border rounded-xl outline-none">
+                        <input type="text" id="prodImage" autocomplete="off" placeholder="https://images.unsplash.com/..." class="w-full p-3 border rounded-xl outline-none">
                     </div>
                 </div>
                 <button onclick="addNewProduct()" class="w-full gold-bg text-black py-3 rounded-xl font-bold hover:opacity-90 transition shadow-lg">Publish Product</button>
@@ -676,7 +688,11 @@ app.get('/', (req, res) => {
                 }
             }
 
-            function openAuthModal() { document.getElementById('authModal').classList.remove('hidden'); }
+            function openAuthModal() {
+                document.getElementById('authEmail').value = '';
+                document.getElementById('authPassword').value = '';
+                document.getElementById('authModal').classList.remove('hidden');
+            }
             function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
            
             function toggleAuthMode() {
@@ -685,6 +701,8 @@ app.get('/', (req, res) => {
                 document.getElementById('registerFields').classList.toggle('hidden');
                 document.getElementById('authSubmitBtn').innerText = isRegisterMode ? 'Register Now' : 'Login';
                 document.getElementById('authToggleText').innerText = isRegisterMode ? 'Already have an account?' : "Don't have an account?";
+                document.getElementById('authEmail').value = '';
+                document.getElementById('authPassword').value = '';
             }
 
             async function handleAuthSubmit() {
