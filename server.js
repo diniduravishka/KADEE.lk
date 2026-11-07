@@ -167,7 +167,7 @@ app.get('/api/admin/stats', async (req, res) => {
   }
 });
 
-// --- FRONTEND UI (Exact LankaCart Black & Gold Curved Wave Theme) ---
+// --- FRONTEND UI (Exact LankaCart Black & Gold Curved Wave Background) ---
 app.get('/', (req, res) => {
   res.send(`
     <!DOCTYPE html>
@@ -180,25 +180,37 @@ app.get('/', (req, res) => {
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
-            body { font-family: 'Poppins', sans-serif; background-color: #000000; color: #fff; overflow-x: hidden; }
+            body { font-family: 'Poppins', sans-serif; background-color: #0b0b0b; color: #fff; overflow-x: hidden; }
             .gold-text { color: #f3ba2f; }
             .gold-bg { background: linear-gradient(135deg, #f5d77f 0%, #d4af37 50%, #aa820a 100%); color: #000; }
             .gold-border { border-color: #f3ba2f; }
           
-            /* Luxury Curved Gold Wave Background */
+            /* Exact LankaCart Curved Gold Wave Background matching Reference Photo */
             .luxury-curved-bg {
-                background:
-                    radial-gradient(circle at top right, rgba(243, 186, 47, 0.28) 0%, rgba(212, 160, 23, 0.1) 35%, transparent 65%),
-                    radial-gradient(circle at 85% 45%, rgba(243, 186, 47, 0.18) 0%, transparent 55%),
-                    linear-gradient(135deg, #0b0b0b 0%, #000000 100%);
+                background-color: #050505;
+                background-image:
+                    radial-gradient(circle at 0% 0%, rgba(212, 175, 55, 0.25) 0%, transparent 40%),
+                    radial-gradient(circle at 100% 90%, rgba(212, 175, 55, 0.2) 0%, transparent 45%),
+                    linear-gradient(135deg, #111 0%, #050505 100%);
                 position: relative;
             }
+            /* Top Curved Gold Wave Effect */
             .luxury-curved-bg::before {
                 content: '';
                 position: absolute;
-                top: 0; right: 0; width: 70%; height: 500px;
-                background: radial-gradient(ellipse at top right, rgba(243, 186, 47, 0.22) 0%, rgba(0,0,0,0) 75%);
-                border-bottom-left-radius: 100% 50%;
+                top: 0; left: 0; width: 45%; height: 250px;
+                background: radial-gradient(ellipse at top left, rgba(243, 186, 47, 0.35) 0%, rgba(0,0,0,0) 70%);
+                border-bottom-right-radius: 100% 80%;
+                pointer-events: none;
+                z-index: 1;
+            }
+            /* Bottom Curved Gold Wave Effect matching reference photo */
+            .luxury-curved-bg::after {
+                content: '';
+                position: absolute;
+                bottom: 0; right: 0; width: 50%; height: 300px;
+                background: radial-gradient(ellipse at bottom right, rgba(243, 186, 47, 0.25) 0%, rgba(0,0,0,0) 70%);
+                border-top-left-radius: 100% 80%;
                 pointer-events: none;
                 z-index: 1;
             }
@@ -466,7 +478,7 @@ app.get('/', (req, res) => {
             </div>
         </footer>
 
-        <!-- Auth Modal (Login / Register with "Dinidu ravishka") -->
+        <!-- Auth Modal -->
         <div id="authModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex justify-center items-center p-4 text-gray-900">
             <div class="bg-white p-8 rounded-3xl w-full max-w-md shadow-2xl relative border border-amber-500">
                 <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-black font-bold text-2xl">&times;</button>
@@ -707,6 +719,12 @@ app.get('/', (req, res) => {
                 document.getElementById('authSubmitBtn').innerText = isRegisterMode ? 'Register Now' : 'Login';
                 document.getElementById('authToggleText').innerText = isRegisterMode ? 'Already have an account?' : "Don't have an account?";
               
+                if (isRegisterMode) {
+                    document.getElementById('authEmail').placeholder = 'Maheshi@example.gmail.com';
+                    if(document.getElementById('regName')) document.getElementById('regName').placeholder = 'Dinidu ravishka';
+                } else {
+                    document.getElementById('authEmail').placeholder = 'Dinidu ravishka';
+                }
                 document.getElementById('authEmail').value = '';
                 document.getElementById('authPassword').value = '';
                 if(document.getElementById('regName')) document.getElementById('regName').value = '';
