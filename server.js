@@ -60,22 +60,22 @@ async function seedDatabase() {
   try {
     await User.findOneAndUpdate(
       { email: 'diniduravishka649@gmail.com' },
-      {
-        name: 'Dinidu ravishka',
-        email: 'diniduravishka649@gmail.com',
-        password: 'ACD172aus@kc',
-        role: 'admin'
+      { 
+        name: 'Dinidu ravishka', 
+        email: 'diniduravishka649@gmail.com', 
+        password: 'ACD172aus@kc', 
+        role: 'admin' 
       },
       { upsert: true, new: true }
     );
 
     await User.findOneAndUpdate(
       { email: 'Maheshi@example.com' },
-      {
-        name: 'Maheshi herath',
-        email: 'Maheshi@example.com',
-        password: 'PMD1512hmp#@qc',
-        role: 'admin'
+      { 
+        name: 'Maheshi herath', 
+        email: 'Maheshi@example.com', 
+        password: 'PMD1512hmp#@qc', 
+        role: 'admin' 
       },
       { upsert: true, new: true }
     );
@@ -106,13 +106,13 @@ app.post('/api/register', async (req, res) => {
     const { name, email, password, role } = req.body;
     const existingUser = await User.findOne({ email: email.trim().toLowerCase() });
     if (existingUser) return res.status(400).json({ error: 'Email already registered!' });
-   
+    
     const assignedRole = (role === 'seller') ? 'seller' : 'buyer';
-    const newUser = new User({
-      name: name.trim(),
-      email: email.trim().toLowerCase(),
-      password: password.trim(),
-      role: assignedRole
+    const newUser = new User({ 
+      name: name.trim(), 
+      email: email.trim().toLowerCase(), 
+      password: password.trim(), 
+      role: assignedRole 
     });
     await newUser.save();
     res.json({ success: true, message: 'Registration successful!' });
@@ -125,15 +125,15 @@ app.post('/api/login', async (req, res) => {
   try {
     const loginInput = req.body.email ? req.body.email.trim() : '';
     const passwordInput = req.body.password ? req.body.password.trim() : '';
-   
-    const user = await User.findOne({
+    
+    const user = await User.findOne({ 
       $or: [
-        { email: loginInput.toLowerCase() },
+        { email: loginInput.toLowerCase() }, 
         { name: loginInput }
-      ],
-      password: passwordInput
+      ], 
+      password: passwordInput 
     });
-   
+    
     if (!user) return res.status(400).json({ error: 'Invalid username/email or password!' });
     res.json({ success: true, user });
   } catch (err) {
@@ -178,18 +178,18 @@ app.get('/api/admin/stats', async (req, res) => {
     const buyerCount = await User.countDocuments({ role: 'buyer' });
     const sellerCount = await User.countDocuments({ role: 'seller' });
     const adminCount = await User.countDocuments({ role: 'admin' });
-   
+    
     const products = await Product.find({});
     const orders = await Order.find({});
 
-    res.json({
-      totalUsers,
-      buyerCount,
-      sellerCount,
+    res.json({ 
+      totalUsers, 
+      buyerCount, 
+      sellerCount, 
       adminCount,
-      productCount: products.length,
+      productCount: products.length, 
       products,
-      orders
+      orders 
     });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch stats' });
@@ -234,7 +234,7 @@ app.get('/', (req, res) => {
                     <div class="bg-white text-orange-600 p-2 rounded-xl shadow"><i class="fa-solid fa-store"></i></div>
                     KADEE<span class="text-yellow-300">.LK</span>
                 </a>
-               
+                
                 <div class="flex-1 max-w-3xl relative hidden md:block" id="searchBarContainer">
                     <input type="search" id="searchInput" autocomplete="off" placeholder="Search for products, brands and categories in KADEE.LK..." class="w-full py-3 px-5 rounded-l-xl text-gray-800 focus:outline-none shadow-inner font-medium">
                     <button onclick="searchProducts()" class="absolute right-0 top-0 bg-yellow-400 text-orange-950 px-8 py-3 rounded-r-xl font-extrabold hover:bg-yellow-300 transition shadow">
@@ -382,7 +382,7 @@ app.get('/', (req, res) => {
                 <h2 class="text-2xl font-black text-gray-900 flex items-center gap-2"><i class="fa-solid fa-bolt text-orange-500"></i> Flash Sale & Trending Items</h2>
                 <span class="text-sm font-semibold text-gray-500">Showing curated mega collection</span>
             </div>
-           
+            
             <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 <div class="text-center col-span-full py-16 text-gray-400 font-medium">Loading mega marketplace...</div>
             </div>
@@ -393,7 +393,7 @@ app.get('/', (req, res) => {
             <div class="bg-white p-8 rounded-3xl w-full max-w-md shadow-2xl relative transform transition-all">
                 <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-black font-bold text-2xl">&times;</button>
                 <h3 id="authTitle" class="text-2xl font-black mb-6 text-gray-900">Login to KADEE.LK</h3>
-               
+                
                 <div id="registerFields" class="hidden space-y-4 mb-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Full Name</label>
@@ -420,7 +420,7 @@ app.get('/', (req, res) => {
                 </div>
                 <button onclick="handleAuthSubmit()" id="authSubmitBtn" class="w-full bg-orange-600 text-white py-3 rounded-xl font-bold hover:bg-orange-700 transition shadow-lg">Login</button>
                 <p class="text-sm text-center mt-6 text-gray-600">
-                    <span id="authToggleText">Don't have an account?</span>
+                    <span id="authToggleText">Don't have an account?</span> 
                     <button onclick="toggleAuthMode()" class="text-orange-600 font-extrabold underline ml-1">Register here</button>
                 </p>
             </div>
@@ -458,7 +458,7 @@ app.get('/', (req, res) => {
             <div class="bg-white p-8 rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl relative">
                 <button onclick="openAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-black font-bold text-2xl">&times;</button>
                 <h3 class="text-2xl font-black mb-6 text-purple-700 flex items-center gap-2"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard & Analytics</h3>
-               
+                
                 <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-8">
                     <div class="bg-purple-50 p-4 rounded-2xl border border-purple-100 text-center">
                         <h4 class="text-gray-600 font-semibold text-xs uppercase">Total Users</h4>
@@ -529,7 +529,7 @@ app.get('/', (req, res) => {
                 const categoriesNav = document.getElementById('categoriesNav');
                 const searchBarContainer = document.getElementById('searchBarContainer');
                 const cartIconWrapper = document.getElementById('cartIconWrapper');
-               
+                
                 adminBtn.classList.add('hidden');
                 sellerBtn.classList.add('hidden');
                 roleBanner.classList.add('hidden');
@@ -571,7 +571,7 @@ app.get('/', (req, res) => {
                 try {
                     const res = await fetch('/api/admin/stats');
                     const stats = await res.json();
-                   
+                    
                     document.getElementById('directAdminTotalUsers').innerText = stats.totalUsers;
                     document.getElementById('directAdminBuyerCount').innerText = stats.buyerCount;
                     document.getElementById('directAdminSellerCount').innerText = stats.sellerCount;
@@ -661,21 +661,21 @@ app.get('/', (req, res) => {
                 }
             }
 
-            function openAuthModal() {
+            function openAuthModal() { 
                 document.getElementById('authEmail').value = '';
                 document.getElementById('authPassword').value = '';
-                document.getElementById('authModal').classList.remove('hidden');
+                document.getElementById('authModal').classList.remove('hidden'); 
             }
-           
+            
             function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
-           
+            
             function toggleAuthMode() {
                 isRegisterMode = !isRegisterMode;
                 document.getElementById('authTitle').innerText = isRegisterMode ? 'Create KADEE.LK Account' : 'Login to KADEE.LK';
                 document.getElementById('registerFields').classList.toggle('hidden');
                 document.getElementById('authSubmitBtn').innerText = isRegisterMode ? 'Register Now' : 'Login';
                 document.getElementById('authToggleText').innerText = isRegisterMode ? 'Already have an account?' : "Don't have an account?";
-               
+                
                 if (isRegisterMode) {
                     document.getElementById('authLabelEmail').innerText = 'Email Address';
                     document.getElementById('authEmail').placeholder = 'Maheshi@example.com';
@@ -713,7 +713,7 @@ app.get('/', (req, res) => {
                     const data = await res.json();
                     if (data.success) {
                         const userObj = data.user;
-                       
+                        
                         // If Admin, simulate Biometric / Face ID / Fingerprint verification for high security
                         if (userObj.role === 'admin') {
                             if (window.PublicKeyCredential) {
@@ -747,12 +747,12 @@ app.get('/', (req, res) => {
                 window.location.reload();
             }
 
-            function openSellerModal() {
+            function openSellerModal() { 
                 if (!currentUser || (currentUser.role !== 'seller' && currentUser.role !== 'admin')) {
                     alert('Access Denied! Sellers only.');
                     return;
                 }
-                document.getElementById('sellerModal').classList.toggle('hidden');
+                document.getElementById('sellerModal').classList.toggle('hidden'); 
             }
 
             async function addNewProduct() {
@@ -761,7 +761,7 @@ app.get('/', (req, res) => {
                 const category = document.getElementById('prodCategory').value;
                 const image = document.getElementById('prodImage').value;
                 if (!title || !price || !category || !image) { alert('Please fill in all product details!'); return; }
-               
+                
                 const res = await fetch('/api/products', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -852,5 +852,5 @@ app.get('/', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-}); 
-1 deleted message in this conversation. View message or delete forever.
+});
+
