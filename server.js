@@ -167,7 +167,7 @@ app.get('/api/admin/stats', async (req, res) => {
   }
 });
 
-// --- FRONTEND UI (Luxury Black & Gold Curved Theme with Top Header Links) ---
+// --- FRONTEND UI (Luxury Black & Gold Curved Wave Theme matching Reference 3) ---
 app.get('/', (req, res) => {
   res.send(`
     <!DOCTYPE html>
@@ -180,23 +180,34 @@ app.get('/', (req, res) => {
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
-            body { font-family: 'Poppins', sans-serif; background-color: #0b0b0b; color: #fff; overflow-x: hidden; }
+            body { font-family: 'Poppins', sans-serif; background-color: #050505; color: #fff; overflow-x: hidden; }
             .gold-text { color: #f3ba2f; }
             .gold-bg { background-color: #f3ba2f; }
             .gold-border { border-color: #f3ba2f; }
-            /* Luxury Curved Gold Wave Overlay Matching Reference */
-            .gold-curve-bg {
-                background: radial-gradient(circle at 10% 10%, rgba(243, 186, 47, 0.18) 0%, transparent 45%),
-                            radial-gradient(circle at 90% 20%, rgba(243, 186, 47, 0.12) 0%, transparent 40%),
-                            #0b0b0b;
+           
+            /* Exact Luxury Curved Gold Wave Background matching Reference Image 3 */
+            .luxury-curved-bg {
+                background:
+                    radial-gradient(circle at top right, rgba(243, 186, 47, 0.22) 0%, rgba(212, 160, 23, 0.08) 35%, transparent 60%),
+                    radial-gradient(circle at 80% 40%, rgba(243, 186, 47, 0.15) 0%, transparent 50%),
+                    linear-gradient(135deg, #0b0b0b 0%, #000000 100%);
                 position: relative;
+            }
+            .luxury-curved-bg::before {
+                content: '';
+                position: absolute;
+                top: 0; right: 0; width: 65%; height: 450px;
+                background: radial-gradient(ellipse at top right, rgba(243, 186, 47, 0.18) 0%, rgba(0,0,0,0) 70%);
+                border-bottom-left-radius: 100% 50%;
+                pointer-events: none;
+                z-index: 1;
             }
         </style>
     </head>
-    <body class="gold-curve-bg text-white">
+    <body class="luxury-curved-bg text-white">
 
         <!-- Top Header Bar with Phone, Email & Track Order | Help | About Us -->
-        <div class="bg-[#141414] text-xs py-2 px-6 flex justify-between items-center border-b border-zinc-800">
+        <div class="bg-[#101010] text-xs py-2 px-6 flex justify-between items-center border-b border-zinc-800 relative z-20">
             <div class="flex items-center space-x-6">
                 <span><i class="fa-solid fa-phone gold-text mr-1"></i> +94 70 7521 138</span>
                 <span><i class="fa-solid fa-envelope gold-text mr-1"></i> diniduravishka649@gmail.com</span>
@@ -212,7 +223,7 @@ app.get('/', (req, res) => {
         </div>
 
         <!-- Main Header -->
-        <header id="mainHeader" class="bg-[#0b0b0b]/90 backdrop-blur-md py-4 shadow-md sticky top-0 z-50 border-b border-zinc-800">
+        <header id="mainHeader" class="bg-[#0b0b0b]/95 backdrop-blur-md py-4 shadow-xl sticky top-0 z-50 border-b border-zinc-800">
             <div class="container mx-auto px-6 flex items-center justify-between gap-4">
                 <a href="/" class="text-3xl font-black tracking-wider flex items-center gap-2">
                     <div class="bg-gradient-to-r from-amber-500 to-yellow-300 text-black p-2 rounded-xl shadow"><i class="fa-solid fa-store"></i></div>
@@ -247,7 +258,7 @@ app.get('/', (req, res) => {
         </header>
 
         <!-- Navigation Bar -->
-        <nav id="categoriesNav" class="bg-[#141414] border-t border-zinc-800 shadow-sm sticky top-[76px] z-40">
+        <nav id="categoriesNav" class="bg-[#121212] border-t border-zinc-800 shadow-sm sticky top-[76px] z-40">
             <div class="container mx-auto px-6 py-3 flex items-center justify-between overflow-x-auto text-sm font-bold text-zinc-300">
                 <div class="flex space-x-8 items-center">
                     <button onclick="filterCategory('All')" class="gold-bg text-black px-4 py-2 rounded-xl flex items-center gap-2 shadow font-extrabold"><i class="fa-solid fa-bars"></i> All Categories</button>
@@ -327,10 +338,10 @@ app.get('/', (req, res) => {
             </div>
         </div>
 
-        <!-- Hero Section with Luxury Gold Waves and Shopping Cart Illustration -->
-        <div id="heroBanner" class="container mx-auto px-6 mt-8 relative">
-            <div class="flex flex-col md:flex-row justify-between items-center py-6">
-                <div class="max-w-xl z-10">
+        <!-- Hero Section with Luxury Gold Curves matching Reference 3 -->
+        <div id="heroBanner" class="container mx-auto px-6 mt-8 relative z-10">
+            <div class="flex flex-col md:flex-row justify-between items-center py-8">
+                <div class="max-w-xl">
                     <h1 class="text-4xl md:text-5xl font-black mb-3">Welcome to <br><span class="gold-text">KADEE.LK</span></h1>
                     <p class="text-xl font-bold mb-2">Your One-Stop Online Marketplace</p>
                     <p class="text-zinc-400 text-sm mb-6">Shop from thousands of products with trust and convenience.</p>
@@ -338,22 +349,22 @@ app.get('/', (req, res) => {
                         Shop Now <i class="fa-solid fa-arrow-right"></i>
                     </button>
                 </div>
-                <!-- Featured Shopping Cart Illustration with Gold Styling -->
-                <div class="mt-8 md:mt-0 z-10 flex flex-col items-center">
-                    <div class="bg-[#141414]/90 backdrop-blur-md p-8 rounded-3xl border border-amber-500/40 shadow-2xl relative text-center">
+                <!-- Shopping Cart Illustration Box on the right matching Reference 3 -->
+                <div class="mt-8 md:mt-0 flex flex-col items-center">
+                    <div class="bg-[#121212]/95 backdrop-blur-md p-8 rounded-3xl border border-amber-500/50 shadow-2xl relative text-center">
                         <div class="absolute -top-3 -right-3 gold-bg text-black text-xs font-black px-3 py-1 rounded-full shadow">MEGA CART</div>
-                        <i class="fa-solid fa-cart-shopping text-7xl gold-text mb-4 animate-bounce"></i>
+                        <i class="fa-solid fa-cart-shopping text-7xl gold-text mb-4"></i>
                         <p class="text-xs font-bold text-zinc-300">Fast Islandwide Checkout</p>
                     </div>
                     <!-- Trust Badges -->
                     <div class="flex space-x-3 mt-6">
-                        <div class="bg-[#141414] px-4 py-2 rounded-full flex items-center gap-2 border border-zinc-800 text-xs">
+                        <div class="bg-[#121212] px-4 py-2 rounded-full flex items-center gap-2 border border-zinc-800 text-xs shadow">
                             <i class="fa-solid fa-check gold-text"></i> Secure Payment
                         </div>
-                        <div class="bg-[#141414] px-4 py-2 rounded-full flex items-center gap-2 border border-zinc-800 text-xs">
+                        <div class="bg-[#121212] px-4 py-2 rounded-full flex items-center gap-2 border border-zinc-800 text-xs shadow">
                             <i class="fa-solid fa-check gold-text"></i> Fast Delivery
                         </div>
-                        <div class="bg-[#141414] px-4 py-2 rounded-full flex items-center gap-2 border border-zinc-800 text-xs">
+                        <div class="bg-[#121212] px-4 py-2 rounded-full flex items-center gap-2 border border-zinc-800 text-xs shadow">
                             <i class="fa-solid fa-check gold-text"></i> Easy Returns
                         </div>
                     </div>
@@ -362,8 +373,8 @@ app.get('/', (req, res) => {
         </div>
 
         <!-- Categories Icons Row -->
-        <div id="categoryIconsRow" class="container mx-auto px-6 my-10">
-            <div class="bg-[#141414] p-6 rounded-3xl grid grid-cols-3 sm:grid-cols-5 md:grid-cols-10 gap-4 text-center border border-zinc-800 shadow-xl">
+        <div id="categoryIconsRow" class="container mx-auto px-6 my-10 relative z-10">
+            <div class="bg-[#121212] p-6 rounded-3xl grid grid-cols-3 sm:grid-cols-5 md:grid-cols-10 gap-4 text-center border border-zinc-800 shadow-2xl">
                 <div onclick="filterCategory('Mobiles')" class="cursor-pointer group">
                     <div class="bg-white/5 group-hover:bg-[#f3ba2f] group-hover:text-black p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-mobile-screen text-xl gold-text group-hover:text-black"></i></div>
                     <span class="text-xs font-semibold">Mobiles</span>
@@ -408,7 +419,7 @@ app.get('/', (req, res) => {
         </div>
 
         <!-- Main Product Section -->
-        <main id="mainProductSection" class="container mx-auto px-6 my-10">
+        <main id="mainProductSection" class="container mx-auto px-6 my-10 relative z-10">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-star gold-text"></i> Featured Products</h2>
                 <button onclick="filterCategory('All')" class="text-sm font-semibold text-zinc-400 hover:gold-text flex items-center gap-1">View All <i class="fa-solid fa-arrow-right"></i></button>
@@ -420,7 +431,7 @@ app.get('/', (req, res) => {
         </main>
 
         <!-- Footer matching layout -->
-        <footer class="bg-[#141414] pt-12 pb-6 border-t border-zinc-800 mt-16 text-sm">
+        <footer class="bg-[#121212] pt-12 pb-6 border-t border-zinc-800 mt-16 text-sm relative z-10">
             <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                 <div>
                     <a href="/" class="text-2xl font-black tracking-wider flex items-center gap-2 mb-4">
@@ -462,7 +473,7 @@ app.get('/', (req, res) => {
             </div>
         </footer>
 
-        <!-- Auth Modal with 'Dinidu ravishka' Login Placeholder -->
+        <!-- Auth Modal (Login placeholder: Dinidu ravishka, Register placeholder: Maheshi@example.gamil.com) -->
         <div id="authModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex justify-center items-center p-4 text-gray-900">
             <div class="bg-white p-8 rounded-3xl w-full max-w-md shadow-2xl relative border border-amber-500">
                 <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-black font-bold text-2xl">&times;</button>
@@ -471,7 +482,7 @@ app.get('/', (req, res) => {
                 <div id="registerFields" class="hidden space-y-4 mb-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Full Name</label>
-                        <input type="text" id="regName" autocomplete="off" placeholder="Dinidu ravishka" class="w-full p-3 border rounded-xl outline-none">
+                        <input type="text" id="regName" autocomplete="off" placeholder="Maheshi herath" class="w-full p-3 border rounded-xl outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Account Role</label>
@@ -701,17 +712,24 @@ app.get('/', (req, res) => {
                 document.getElementById('registerFields').classList.toggle('hidden');
                 document.getElementById('authSubmitBtn').innerText = isRegisterMode ? 'Register Now' : 'Login';
                 document.getElementById('authToggleText').innerText = isRegisterMode ? 'Already have an account?' : "Don't have an account?";
+               
+                // Switch placeholder based on mode
+                if (isRegisterMode) {
+                    document.getElementById('authEmail').placeholder = 'Maheshi@example.gamil.com';
+                } else {
+                    document.getElementById('authEmail').placeholder = 'Dinidu ravishka';
+                }
                 document.getElementById('authEmail').value = '';
                 document.getElementById('authPassword').value = '';
             }
 
             async function handleAuthSubmit() {
-                const email = document.getElementById('authEmail').value.trim();
+                const email = document.getElementById('authEmail').value.trim() || document.getElementById('authEmail').placeholder;
                 const password = document.getElementById('authPassword').value.trim();
-                if (!email || !password) { alert('Please enter username/email and password!'); return; }
+                if (!password) { alert('Please enter password!'); return; }
 
                 if (isRegisterMode) {
-                    const name = document.getElementById('regName').value.trim();
+                    const name = document.getElementById('regName').value.trim() || 'Maheshi herath';
                     const role = document.getElementById('regRole').value;
                     const res = await fetch('/api/register', {
                         method: 'POST',
