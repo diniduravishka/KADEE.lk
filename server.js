@@ -167,7 +167,7 @@ app.get('/api/admin/stats', async (req, res) => {
   }
 });
 
-// --- FRONTEND UI (Luxury Black & Gold Theme with Shopping Cart & Carved Wave Accents) ---
+// --- FRONTEND UI (Luxury Black & Gold Curved Theme with Top Header Links) ---
 app.get('/', (req, res) => {
   res.send(`
     <!DOCTYPE html>
@@ -184,10 +184,10 @@ app.get('/', (req, res) => {
             .gold-text { color: #f3ba2f; }
             .gold-bg { background-color: #f3ba2f; }
             .gold-border { border-color: #f3ba2f; }
-            /* Luxury Curved Gold Wave Overlay */
+            /* Luxury Curved Gold Wave Overlay Matching Reference */
             .gold-curve-bg {
-                background: radial-gradient(circle at top right, rgba(243, 186, 47, 0.15), transparent 40%),
-                            radial-gradient(circle at bottom left, rgba(243, 186, 47, 0.1), transparent 50%),
+                background: radial-gradient(circle at 10% 10%, rgba(243, 186, 47, 0.18) 0%, transparent 45%),
+                            radial-gradient(circle at 90% 20%, rgba(243, 186, 47, 0.12) 0%, transparent 40%),
                             #0b0b0b;
                 position: relative;
             }
@@ -195,19 +195,19 @@ app.get('/', (req, res) => {
     </head>
     <body class="gold-curve-bg text-white">
 
-        <!-- Top Header Bar -->
+        <!-- Top Header Bar with Phone, Email & Track Order | Help | About Us -->
         <div class="bg-[#141414] text-xs py-2 px-6 flex justify-between items-center border-b border-zinc-800">
             <div class="flex items-center space-x-6">
                 <span><i class="fa-solid fa-phone gold-text mr-1"></i> +94 70 7521 138</span>
                 <span><i class="fa-solid fa-envelope gold-text mr-1"></i> diniduravishka649@gmail.com</span>
             </div>
-            <div class="flex space-x-6 items-center font-medium">
+            <div class="flex space-x-4 items-center font-medium">
                 <span id="userDisplay" class="text-amber-200"></span>
-                <a href="#" onclick="alert('Tracking page simulation')" class="hover:gold-text">Track Order</a>
-                <span>|</span>
-                <a href="#" onclick="alert('Help & Support')" class="hover:gold-text">Help</a>
-                <span>|</span>
-                <a href="#" onclick="alert('About us')" class="hover:gold-text">About Us</a>
+                <a href="#" onclick="alert('Redirecting to Track Order...')" class="hover:gold-text transition">Track Order</a>
+                <span class="text-zinc-600">|</span>
+                <a href="#" onclick="alert('KADEE.LK Help & Support Center')" class="hover:gold-text transition">Help</a>
+                <span class="text-zinc-600">|</span>
+                <a href="#" onclick="alert('About KADEE.LK - Sri Lanka\\'s #1 Marketplace')" class="hover:gold-text transition">About Us</a>
             </div>
         </div>
 
@@ -327,7 +327,7 @@ app.get('/', (req, res) => {
             </div>
         </div>
 
-        <!-- Hero Section with Luxury Carved Wave Background matching target image -->
+        <!-- Hero Section with Luxury Gold Waves and Shopping Cart Illustration -->
         <div id="heroBanner" class="container mx-auto px-6 mt-8 relative">
             <div class="flex flex-col md:flex-row justify-between items-center py-6">
                 <div class="max-w-xl z-10">
@@ -338,14 +338,14 @@ app.get('/', (req, res) => {
                         Shop Now <i class="fa-solid fa-arrow-right"></i>
                     </button>
                 </div>
-                <!-- Featured Shopping Cart Illustration on the right with gold ambient curves -->
+                <!-- Featured Shopping Cart Illustration with Gold Styling -->
                 <div class="mt-8 md:mt-0 z-10 flex flex-col items-center">
-                    <div class="bg-[#141414]/80 backdrop-blur-md p-6 rounded-3xl border border-amber-500/30 shadow-2xl relative">
+                    <div class="bg-[#141414]/90 backdrop-blur-md p-8 rounded-3xl border border-amber-500/40 shadow-2xl relative text-center">
                         <div class="absolute -top-3 -right-3 gold-bg text-black text-xs font-black px-3 py-1 rounded-full shadow">MEGA CART</div>
-                        <i class="fa-solid fa-cart-shopping text-7xl gold-text mb-4"></i>
+                        <i class="fa-solid fa-cart-shopping text-7xl gold-text mb-4 animate-bounce"></i>
                         <p class="text-xs font-bold text-zinc-300">Fast Islandwide Checkout</p>
                     </div>
-                    <!-- Trust Badges below -->
+                    <!-- Trust Badges -->
                     <div class="flex space-x-3 mt-6">
                         <div class="bg-[#141414] px-4 py-2 rounded-full flex items-center gap-2 border border-zinc-800 text-xs">
                             <i class="fa-solid fa-check gold-text"></i> Secure Payment
@@ -462,7 +462,7 @@ app.get('/', (req, res) => {
             </div>
         </footer>
 
-        <!-- Auth Modal with autofill disabled and Maheshi@example.gamil.com placeholder -->
+        <!-- Auth Modal with 'Dinidu ravishka' Login Placeholder -->
         <div id="authModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex justify-center items-center p-4 text-gray-900">
             <div class="bg-white p-8 rounded-3xl w-full max-w-md shadow-2xl relative border border-amber-500">
                 <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-black font-bold text-2xl">&times;</button>
@@ -485,7 +485,7 @@ app.get('/', (req, res) => {
                 <div class="space-y-4 mb-6">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1" id="authLabelEmail">Username / Email Address</label>
-                        <input type="text" id="authEmail" autocomplete="off" placeholder="Maheshi@example.gamil.com" class="w-full p-3 border rounded-xl outline-none">
+                        <input type="text" id="authEmail" autocomplete="off" placeholder="Dinidu ravishka" class="w-full p-3 border rounded-xl outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Password</label>
@@ -708,7 +708,7 @@ app.get('/', (req, res) => {
             async function handleAuthSubmit() {
                 const email = document.getElementById('authEmail').value.trim();
                 const password = document.getElementById('authPassword').value.trim();
-                if (!email || !password) { alert('Please enter email and password!'); return; }
+                if (!email || !password) { alert('Please enter username/email and password!'); return; }
 
                 if (isRegisterMode) {
                     const name = document.getElementById('regName').value.trim();
