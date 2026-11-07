@@ -9,18 +9,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // MongoDB Connection
-const MONGO_URI = process.env.MONGO_URI;
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/kadee_lk';
 
-if (MONGO_URI) {
-  mongoose.connect(MONGO_URI)
-    .then(() => {
-      console.log('MongoDB Connected Successfully to KADEE.LK Marketplace!');
-      seedDatabase();
-    })
-    .catch((err) => console.error('MongoDB Connection Error:', err));
-} else {
-  console.error('MONGO_URI is missing in environment variables!');
-}
+mongoose.connect(MONGO_URI)
+  .then(() => {
+    console.log('✅ MongoDB Connected Successfully to KADEE.LK Marketplace!');
+    seedDatabase();
+  })
+  .catch((err) => console.error('❌ MongoDB Connection Error:', err));
 
 // 1. User Schema
 const userSchema = new mongoose.Schema({
@@ -80,7 +76,7 @@ async function seedDatabase() {
         { title: 'Smart Watch', price: 19990, category: 'Electronics', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500', sellerEmail: 'Maheshi@example.com', rating: 4.6, reviewsCount: 85 },
         { title: 'Wireless Earphones', price: 12990, category: 'Electronics', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500', sellerEmail: 'diniduravishka649@gmail.com', rating: 4.5, reviewsCount: 72 }
       ]);
-      console.log('Luxury Gold theme products seeded successfully!');
+      console.log('✨ Luxury Gold theme products seeded successfully!');
     }
   } catch (err) {
     console.error('Error in database seeding:', err);
@@ -167,7 +163,7 @@ app.get('/api/admin/stats', async (req, res) => {
   }
 });
 
-// --- FRONTEND UI (Exact Luxury Black & Gold Curved Wave Background) ---
+// --- FRONTEND UI (Luxury Black & Gold Curved Wave Theme) ---
 app.get('/', (req, res) => {
   res.send(`
     <!DOCTYPE html>
@@ -180,24 +176,24 @@ app.get('/', (req, res) => {
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
-            body { font-family: 'Poppins', sans-serif; background-color: #000000; color: #fff; overflow-x: hidden; }
+            body { font-family: 'Poppins', sans-serif; background-color: #050505; color: #fff; overflow-x: hidden; }
             .gold-text { color: #f3ba2f; }
-            .gold-bg { background: linear-gradient(135deg, #f5d77f 0%, #d4af37 50%, #aa820a 100%); color: #000; }
+            .gold-bg { background-color: #f3ba2f; }
             .gold-border { border-color: #f3ba2f; }
           
-            /* Exact Luxury Curved Gold Wave Background matching Reference */
+            /* Luxury Curved Gold Wave Background */
             .luxury-curved-bg {
                 background:
-                    radial-gradient(circle at top right, rgba(243, 186, 47, 0.28) 0%, rgba(212, 160, 23, 0.1) 35%, transparent 65%),
-                    radial-gradient(circle at 85% 45%, rgba(243, 186, 47, 0.18) 0%, transparent 55%),
+                    radial-gradient(circle at top right, rgba(243, 186, 47, 0.22) 0%, rgba(212, 160, 23, 0.08) 35%, transparent 60%),
+                    radial-gradient(circle at 80% 40%, rgba(243, 186, 47, 0.15) 0%, transparent 50%),
                     linear-gradient(135deg, #0b0b0b 0%, #000000 100%);
                 position: relative;
             }
             .luxury-curved-bg::before {
                 content: '';
                 position: absolute;
-                top: 0; right: 0; width: 70%; height: 500px;
-                background: radial-gradient(ellipse at top right, rgba(243, 186, 47, 0.22) 0%, rgba(0,0,0,0) 75%);
+                top: 0; right: 0; width: 65%; height: 450px;
+                background: radial-gradient(ellipse at top right, rgba(243, 186, 47, 0.18) 0%, rgba(0,0,0,0) 70%);
                 border-bottom-left-radius: 100% 50%;
                 pointer-events: none;
                 z-index: 1;
@@ -206,9 +202,9 @@ app.get('/', (req, res) => {
     </head>
     <body class="luxury-curved-bg text-white">
 
-        <!-- Top Header Bar with Phone, Email & Track Order | Help | About Us -->
+        <!-- Top Header Bar -->
         <div class="bg-[#101010] text-xs py-2 px-6 flex justify-between items-center border-b border-zinc-800 relative z-20">
-            <div class="flex items-center space-x-6 text-zinc-300">
+            <div class="flex items-center space-x-6">
                 <span><i class="fa-solid fa-phone gold-text mr-1"></i> +94 70 7521 138</span>
                 <span><i class="fa-solid fa-envelope gold-text mr-1"></i> diniduravishka649@gmail.com</span>
             </div>
@@ -226,13 +222,13 @@ app.get('/', (req, res) => {
         <header id="mainHeader" class="bg-[#0b0b0b]/95 backdrop-blur-md py-4 shadow-xl sticky top-0 z-50 border-b border-zinc-800">
             <div class="container mx-auto px-6 flex items-center justify-between gap-4">
                 <a href="/" class="text-3xl font-black tracking-wider flex items-center gap-2">
-                    <div class="gold-bg p-2 rounded-xl shadow"><i class="fa-solid fa-store"></i></div>
+                    <div class="bg-gradient-to-r from-amber-500 to-yellow-300 text-black p-2 rounded-xl shadow"><i class="fa-solid fa-store"></i></div>
                     KADEE<span class="gold-text">.LK</span>
                 </a>
               
                 <div class="flex-1 max-w-2xl relative hidden md:block" id="searchBarContainer">
                     <input type="search" id="searchInput" autocomplete="off" placeholder="Search for products..." class="w-full py-3 px-5 rounded-l-xl text-gray-900 focus:outline-none shadow-inner font-medium">
-                    <button onclick="searchProducts()" class="absolute right-0 top-0 gold-bg px-8 py-3 rounded-r-xl font-extrabold hover:opacity-90 transition shadow">
+                    <button onclick="searchProducts()" class="absolute right-0 top-0 bg-gradient-to-r from-amber-500 to-yellow-400 text-black px-8 py-3 rounded-r-xl font-extrabold hover:opacity-90 transition shadow">
                         <i class="fa-solid fa-search"></i>
                     </button>
                 </div>
@@ -241,16 +237,16 @@ app.get('/', (req, res) => {
                     <button id="adminDashboardBtn" onclick="openAdminModal()" class="hidden bg-zinc-900 hover:bg-zinc-800 text-white px-4 py-2 rounded-xl font-bold text-sm shadow transition flex items-center gap-2 border gold-border">
                         <i class="fa-solid fa-gauge-high gold-text"></i> Admin Panel
                     </button>
-                    <button id="sellerDashboardBtn" onclick="openSellerModal()" class="hidden gold-bg text-black px-4 py-2 rounded-xl font-bold text-sm shadow transition flex items-center gap-2">
+                    <button id="sellerDashboardBtn" onclick="openSellerModal()" class="hidden gold-bg hover:opacity-90 text-black px-4 py-2 rounded-xl font-bold text-sm shadow transition flex items-center gap-2">
                         <i class="fa-solid fa-box-archive"></i> Seller Hub
                     </button>
                     <button id="authBtn" onclick="openAuthModal()" class="flex items-center gap-2 hover:gold-text font-semibold">
                         <i class="fa-solid fa-user text-lg gold-text"></i> Login / Register
                     </button>
                     <button id="logoutBtn" onclick="logout()" class="hidden bg-red-600 text-white px-3 py-1.5 rounded-xl font-bold text-sm">Logout</button>
-                    <div id="cartIconWrapper" class="cursor-pointer flex items-center gap-2 gold-bg text-black px-4 py-2 rounded-xl transition shadow font-bold" onclick="toggleCart()">
+                    <div id="cartIconWrapper" class="cursor-pointer flex items-center gap-2 gold-bg hover:opacity-90 text-black px-4 py-2 rounded-xl transition shadow font-bold" onclick="toggleCart()">
                         <i class="fa-solid fa-cart-shopping text-xl"></i>
-                        <span id="cartCount" class="bg-black text-amber-300 rounded-full px-2 py-0.5 text-xs font-black">0</span>
+                        <span id="cartCount" class="bg-black gold-text rounded-full px-2 py-0.5 text-xs font-black">0</span>
                         <span id="cartTotalText" class="font-extrabold text-sm">Rs. 0</span>
                     </div>
                 </div>
@@ -263,7 +259,9 @@ app.get('/', (req, res) => {
                 <div class="flex space-x-8 items-center">
                     <button onclick="filterCategory('All')" class="gold-bg text-black px-4 py-2 rounded-xl flex items-center gap-2 shadow font-extrabold"><i class="fa-solid fa-bars"></i> All Categories</button>
                     <button onclick="filterCategory('Home')" class="hover:gold-text flex items-center gap-1"><i class="fa-solid fa-house gold-text"></i> Home</button>
-                    <button onclick="filterCategory('Categories')" class="hover:gold-text flex items-center gap-1">Categories <i class="fa-solid fa-chevron-down text-xs"></i></button>
+                    <div class="relative group cursor-pointer">
+                        <span class="hover:gold-text flex items-center gap-1">Categories <i class="fa-solid fa-chevron-down text-xs"></i></span>
+                    </div>
                     <button onclick="filterCategory('Deals')" class="hover:gold-text flex items-center gap-1"><i class="fa-solid fa-tag gold-text"></i> Deals</button>
                     <button onclick="filterCategory('Sellers')" class="hover:gold-text flex items-center gap-1"><i class="fa-solid fa-store gold-text"></i> Sellers</button>
                     <button onclick="filterCategory('Orders')" class="hover:gold-text flex items-center gap-1"><i class="fa-solid fa-box gold-text"></i> Orders</button>
@@ -283,6 +281,7 @@ app.get('/', (req, res) => {
                     </div>
                 </div>
 
+                <!-- Stats Cards -->
                 <div class="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-8">
                     <div class="bg-amber-50 p-6 rounded-2xl border border-amber-200 text-center shadow-sm">
                         <h4 class="text-gray-600 font-semibold text-xs uppercase">Total Users</h4>
@@ -302,6 +301,7 @@ app.get('/', (req, res) => {
                     </div>
                 </div>
 
+                <!-- Growth Analytics Bar Charts -->
                 <div class="bg-gray-50 p-8 rounded-2xl border border-gray-200 mb-8 shadow-inner">
                     <h4 class="font-black text-lg mb-6 text-gray-900 flex items-center gap-2"><i class="fa-solid fa-chart-bar gold-text"></i> Marketplace Registration Growth Bar Charts</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -326,6 +326,7 @@ app.get('/', (req, res) => {
                     </div>
                 </div>
 
+                <!-- Recent Customer Orders -->
                 <h4 class="font-black text-xl mb-4 text-gray-900 flex items-center gap-2"><i class="fa-solid fa-receipt text-green-600"></i> Recent Customer Orders</h4>
                 <div id="directAdminOrdersList" class="space-y-3 text-sm">
                     <p class="text-gray-400">Loading orders...</p>
@@ -333,25 +334,23 @@ app.get('/', (req, res) => {
             </div>
         </div>
 
-        <!-- Hero Section with Luxury Gold Curves matching Reference -->
+        <!-- Hero Section -->
         <div id="heroBanner" class="container mx-auto px-6 mt-8 relative z-10">
             <div class="flex flex-col md:flex-row justify-between items-center py-8">
                 <div class="max-w-xl">
                     <h1 class="text-4xl md:text-5xl font-black mb-3">Welcome to <br><span class="gold-text">KADEE.LK</span></h1>
                     <p class="text-xl font-bold mb-2">Your One-Stop Online Marketplace</p>
                     <p class="text-zinc-400 text-sm mb-6">Shop from thousands of products with trust and convenience.</p>
-                    <button onclick="window.scrollTo({top: 600, behavior: 'smooth'})" class="gold-bg font-extrabold px-8 py-3.5 rounded-2xl shadow-xl hover:opacity-90 transition flex items-center gap-2">
+                    <button onclick="window.scrollTo({top: 600, behavior: 'smooth'})" class="gold-bg text-black font-extrabold px-8 py-3.5 rounded-2xl shadow-xl hover:opacity-90 transition flex items-center gap-2">
                         Shop Now <i class="fa-solid fa-arrow-right"></i>
                     </button>
                 </div>
-                <!-- Shopping Cart Illustration Box on the right matching Reference -->
                 <div class="mt-8 md:mt-0 flex flex-col items-center">
                     <div class="bg-[#121212]/95 backdrop-blur-md p-8 rounded-3xl border border-amber-500/50 shadow-2xl relative text-center">
-                        <div class="absolute -top-3 -right-3 gold-bg text-xs font-black px-3 py-1 rounded-full shadow">EXPRESS CART</div>
+                        <div class="absolute -top-3 -right-3 gold-bg text-black text-xs font-black px-3 py-1 rounded-full shadow">MEGA CART</div>
                         <i class="fa-solid fa-cart-shopping text-7xl gold-text mb-4"></i>
                         <p class="text-xs font-bold text-zinc-300">Fast Islandwide Checkout</p>
                     </div>
-                    <!-- Trust Badges -->
                     <div class="flex space-x-3 mt-6">
                         <div class="bg-[#121212] px-4 py-2 rounded-full flex items-center gap-2 border border-zinc-800 text-xs shadow">
                             <i class="fa-solid fa-check gold-text"></i> Secure Payment
@@ -371,43 +370,43 @@ app.get('/', (req, res) => {
         <div id="categoryIconsRow" class="container mx-auto px-6 my-10 relative z-10">
             <div class="bg-[#121212] p-6 rounded-3xl grid grid-cols-3 sm:grid-cols-5 md:grid-cols-10 gap-4 text-center border border-zinc-800 shadow-2xl">
                 <div onclick="filterCategory('Mobiles')" class="cursor-pointer group">
-                    <div class="bg-white/5 group-hover:gold-bg group-hover:text-black p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-mobile-screen text-xl gold-text group-hover:text-black"></i></div>
+                    <div class="bg-white/5 group-hover:bg-[#f3ba2f] group-hover:text-black p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-mobile-screen text-xl gold-text group-hover:text-black"></i></div>
                     <span class="text-xs font-semibold">Mobiles</span>
                 </div>
                 <div onclick="filterCategory('Laptops')" class="cursor-pointer group">
-                    <div class="bg-white/5 group-hover:gold-bg group-hover:text-black p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-laptop text-xl gold-text group-hover:text-black"></i></div>
+                    <div class="bg-white/5 group-hover:bg-[#f3ba2f] group-hover:text-black p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-laptop text-xl gold-text group-hover:text-black"></i></div>
                     <span class="text-xs font-semibold">Laptops</span>
                 </div>
                 <div onclick="filterCategory('Electronics')" class="cursor-pointer group">
-                    <div class="bg-white/5 group-hover:gold-bg group-hover:text-black p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-plug text-xl gold-text group-hover:text-black"></i></div>
+                    <div class="bg-white/5 group-hover:bg-[#f3ba2f] group-hover:text-black p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-plug text-xl gold-text group-hover:text-black"></i></div>
                     <span class="text-xs font-semibold">Electronics</span>
                 </div>
                 <div onclick="filterCategory('Fashion')" class="cursor-pointer group">
-                    <div class="bg-white/5 group-hover:gold-bg group-hover:text-black p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-shirt text-xl gold-text group-hover:text-black"></i></div>
+                    <div class="bg-white/5 group-hover:bg-[#f3ba2f] group-hover:text-black p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-shirt text-xl gold-text group-hover:text-black"></i></div>
                     <span class="text-xs font-semibold">Fashion</span>
                 </div>
                 <div onclick="filterCategory('Home')" class="cursor-pointer group">
-                    <div class="bg-white/5 group-hover:gold-bg group-hover:text-black p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-house text-xl gold-text group-hover:text-black"></i></div>
+                    <div class="bg-white/5 group-hover:bg-[#f3ba2f] group-hover:text-black p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-house text-xl gold-text group-hover:text-black"></i></div>
                     <span class="text-xs font-semibold">Home & Living</span>
                 </div>
                 <div onclick="filterCategory('Beauty')" class="cursor-pointer group">
-                    <div class="bg-white/5 group-hover:gold-bg group-hover:text-black p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-spray-can-sparkles text-xl gold-text group-hover:text-black"></i></div>
+                    <div class="bg-white/5 group-hover:bg-[#f3ba2f] group-hover:text-black p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-spray-can-sparkles text-xl gold-text group-hover:text-black"></i></div>
                     <span class="text-xs font-semibold">Beauty</span>
                 </div>
                 <div onclick="filterCategory('Sports')" class="cursor-pointer group">
-                    <div class="bg-white/5 group-hover:gold-bg group-hover:text-black p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-futbol text-xl gold-text group-hover:text-black"></i></div>
+                    <div class="bg-white/5 group-hover:bg-[#f3ba2f] group-hover:text-black p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-futbol text-xl gold-text group-hover:text-black"></i></div>
                     <span class="text-xs font-semibold">Sports</span>
                 </div>
                 <div onclick="filterCategory('Toys')" class="cursor-pointer group">
-                    <div class="bg-white/5 group-hover:gold-bg group-hover:text-black p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-gamepad text-xl gold-text group-hover:text-black"></i></div>
+                    <div class="bg-white/5 group-hover:bg-[#f3ba2f] group-hover:text-black p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-gamepad text-xl gold-text group-hover:text-black"></i></div>
                     <span class="text-xs font-semibold">Toys</span>
                 </div>
                 <div onclick="filterCategory('Books')" class="cursor-pointer group">
-                    <div class="bg-white/5 group-hover:gold-bg group-hover:text-black p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-book text-xl gold-text group-hover:text-black"></i></div>
+                    <div class="bg-white/5 group-hover:bg-[#f3ba2f] group-hover:text-black p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-book text-xl gold-text group-hover:text-black"></i></div>
                     <span class="text-xs font-semibold">Books</span>
                 </div>
                 <div onclick="filterCategory('All')" class="cursor-pointer group">
-                    <div class="bg-white/5 group-hover:gold-bg group-hover:text-black p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-ellipsis text-xl gold-text group-hover:text-black"></i></div>
+                    <div class="bg-white/5 group-hover:bg-[#f3ba2f] group-hover:text-black p-4 rounded-2xl transition mx-auto w-14 h-14 flex items-center justify-center mb-2"><i class="fa-solid fa-ellipsis text-xl gold-text group-hover:text-black"></i></div>
                     <span class="text-xs font-semibold">More</span>
                 </div>
             </div>
@@ -425,12 +424,12 @@ app.get('/', (req, res) => {
             </div>
         </main>
 
-        <!-- Footer matching layout -->
+        <!-- Footer -->
         <footer class="bg-[#121212] pt-12 pb-6 border-t border-zinc-800 mt-16 text-sm relative z-10">
             <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                 <div>
                     <a href="/" class="text-2xl font-black tracking-wider flex items-center gap-2 mb-4">
-                        <div class="gold-bg p-1.5 rounded-lg shadow"><i class="fa-solid fa-store"></i></div>
+                        <div class="gold-bg text-black p-1.5 rounded-lg shadow"><i class="fa-solid fa-store"></i></div>
                         KADEE<span class="gold-text">.LK</span>
                     </a>
                     <p class="text-zinc-400 text-xs leading-relaxed">Shop Smart... Live Better...</p>
@@ -498,7 +497,7 @@ app.get('/', (req, res) => {
                         <input type="password" id="authPassword" autocomplete="new-password" placeholder="••••••••" class="w-full p-3 border rounded-xl outline-none">
                     </div>
                 </div>
-                <button onclick="handleAuthSubmit()" id="authSubmitBtn" class="w-full gold-bg py-3 rounded-xl font-bold hover:opacity-90 transition shadow-lg">Login</button>
+                <button onclick="handleAuthSubmit()" id="authSubmitBtn" class="w-full gold-bg text-black py-3 rounded-xl font-bold hover:opacity-90 transition shadow-lg">Login</button>
                 <p class="text-sm text-center mt-6 text-gray-600">
                     <span id="authToggleText">Don't have an account?</span>
                     <button onclick="toggleAuthMode()" class="gold-text font-extrabold underline ml-1 text-amber-700">Register here</button>
@@ -529,7 +528,7 @@ app.get('/', (req, res) => {
                         <input type="text" id="prodImage" autocomplete="off" placeholder="https://images.unsplash.com/..." class="w-full p-3 border rounded-xl outline-none">
                     </div>
                 </div>
-                <button onclick="addNewProduct()" class="w-full gold-bg py-3 rounded-xl font-bold hover:opacity-90 transition shadow-lg">Publish Product</button>
+                <button onclick="addNewProduct()" class="w-full gold-bg text-black py-3 rounded-xl font-bold hover:opacity-90 transition shadow-lg">Publish Product</button>
             </div>
         </div>
 
@@ -554,7 +553,7 @@ app.get('/', (req, res) => {
                         <option value="COD">Cash on Delivery (COD)</option>
                     </select>
                 </div>
-                <button onclick="checkout()" class="w-full gold-bg py-3.5 rounded-xl font-black hover:opacity-90 transition shadow-lg">Proceed to Checkout</button>
+                <button onclick="checkout()" class="w-full gold-bg text-black py-3.5 rounded-xl font-black hover:opacity-90 transition shadow-lg">Proceed to Checkout</button>
             </div>
         </div>
 
@@ -579,7 +578,7 @@ app.get('/', (req, res) => {
                 directAdminDashboard.classList.add('hidden');
 
                 if (currentUser) {
-                    document.getElementById('userDisplay').innerText = \`👤 \${currentUser.name} (\${currentUser.role})\`;
+                    document.getElementById('userDisplay').innerText = `👤 ${currentUser.name} (${currentUser.role})`;
                     document.getElementById('authBtn').classList.add('hidden');
                     document.getElementById('logoutBtn').classList.remove('hidden');
 
@@ -630,15 +629,15 @@ app.get('/', (req, res) => {
                     if (stats.orders.length === 0) {
                         ordersList.innerHTML = '<p class="text-gray-400">No orders received yet.</p>';
                     } else {
-                        ordersList.innerHTML = stats.orders.map(o => \`
+                        ordersList.innerHTML = stats.orders.map(o => `
                             <div class="bg-gray-50 p-4 rounded-2xl border flex justify-between items-center shadow-sm">
                                 <div>
-                                    <span class="font-black text-xs text-amber-700">Buyer: \${o.buyerEmail}</span>
-                                    <p class="text-xs text-gray-600 mt-0.5">Total: <b>Rs. \${o.totalAmount.toLocaleString()}</b> via \${o.paymentMethod}</p>
+                                    <span class="font-black text-xs text-amber-700">Buyer: ${o.buyerEmail}</span>
+                                    <p class="text-xs text-gray-600 mt-0.5">Total: <b>Rs. ${o.totalAmount.toLocaleString()}</b> via ${o.paymentMethod}</p>
                                 </div>
-                                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-extrabold">\${o.status}</span>
+                                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-extrabold">${o.status}</span>
                             </div>
-                        \`).join('');
+                        `).join('');
                     }
                 } catch(err) {
                     console.error('Failed to load admin stats', err);
@@ -663,26 +662,26 @@ app.get('/', (req, res) => {
                     grid.innerHTML = '<p class="col-span-full text-center text-zinc-400 py-12">No products available.</p>';
                     return;
                 }
-                grid.innerHTML = items.map(p => \`
+                grid.innerHTML = items.map(p => `
                     <div class="bg-white text-gray-900 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 p-3 flex flex-col justify-between border border-zinc-200 group">
                         <div>
                             <div class="relative overflow-hidden rounded-xl mb-3 bg-gray-100">
-                                <img src="\${p.image}" alt="\${p.title}" class="w-full h-40 object-cover group-hover:scale-105 transition duration-300">
+                                <img src="${p.image}" alt="${p.title}" class="w-full h-40 object-cover group-hover:scale-105 transition duration-300">
                             </div>
-                            <h3 class="font-bold text-gray-900 text-sm line-clamp-1">\${p.title}</h3>
-                            <div class="text-amber-600 font-black text-base mt-1">Rs. \${p.price.toLocaleString()}</div>
+                            <h3 class="font-bold text-gray-900 text-sm line-clamp-1">${p.title}</h3>
+                            <div class="text-amber-600 font-black text-base mt-1">Rs. ${p.price.toLocaleString()}</div>
                             <div class="flex items-center gap-1 text-yellow-500 text-xs mt-1 font-semibold">
-                                <span>⭐ \${p.rating}</span>
-                                <span class="text-gray-400">(\${p.reviewsCount || 75})</span>
+                                <span>⭐ ${p.rating}</span>
+                                <span class="text-gray-400">(${p.reviewsCount || 75})</span>
                             </div>
                         </div>
                         <div class="mt-4 pt-3 border-t border-gray-100">
-                            <button onclick="addToCart('\${p._id}')" class="w-full gold-bg hover:opacity-90 text-black py-2 rounded-xl font-bold text-xs shadow transition flex items-center justify-center gap-1.5">
+                            <button onclick="addToCart('${p._id}')" class="w-full bg-[#f3ba2f] hover:opacity-90 text-black py-2 rounded-xl font-bold text-xs shadow transition flex items-center justify-center gap-1.5">
                                 <i class="fa-solid fa-cart-plus"></i> Add to Cart
                             </button>
                         </div>
                     </div>
-                \`).join('');
+                `).join('');
             }
 
             function filterCategory(cat) {
@@ -709,7 +708,7 @@ app.get('/', (req, res) => {
                 document.getElementById('authToggleText').innerText = isRegisterMode ? 'Already have an account?' : "Don't have an account?";
               
                 if (isRegisterMode) {
-                    document.getElementById('authEmail').placeholder = 'Maheshi@example.com';
+                    document.getElementById('authEmail').placeholder = 'Maheshi@example.gamil.com';
                 } else {
                     document.getElementById('authEmail').placeholder = 'Dinidu ravishka';
                 }
@@ -815,18 +814,18 @@ app.get('/', (req, res) => {
                 }
                 container.innerHTML = cart.map((item, index) => {
                     total += item.price;
-                    return \`
+                    return `
                         <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border">
                             <div class="flex items-center gap-3">
-                                <img src="\${item.image}" class="w-12 h-12 object-cover rounded-lg">
+                                <img src="${item.image}" class="w-12 h-12 object-cover rounded-lg">
                                 <div>
-                                    <h4 class="font-bold text-sm line-clamp-1">\${item.title}</h4>
-                                    <span class="text-amber-700 font-extrabold text-xs">Rs. \${item.price.toLocaleString()}</span>
+                                    <h4 class="font-bold text-sm line-clamp-1">${item.title}</h4>
+                                    <span class="text-amber-700 font-extrabold text-xs">Rs. ${item.price.toLocaleString()}</span>
                                 </div>
                             </div>
-                            <button onclick="removeFromCart(\--index)" class="text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>
+                            <button onclick="removeFromCart(${index})" class="text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>
                         </div>
-                    \`;
+                    `;
                 }).join('');
                 document.getElementById('cartTotal').innerText = 'Rs. ' + total.toLocaleString();
                 document.getElementById('cartTotalText').innerText = 'Rs. ' + total.toLocaleString();
@@ -866,5 +865,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`🚀 KADEE.LK Server is running on port ${PORT}`);
 }); 
