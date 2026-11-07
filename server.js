@@ -167,7 +167,7 @@ app.get('/api/admin/stats', async (req, res) => {
   }
 });
 
-// --- FRONTEND UI (Exact Luxury Black & Gold Curved Wave Background) ---
+// --- FRONTEND UI (Exact LankaCart Black & Gold Curved Wave Theme) ---
 app.get('/', (req, res) => {
   res.send(`
     <!DOCTYPE html>
@@ -185,7 +185,7 @@ app.get('/', (req, res) => {
             .gold-bg { background: linear-gradient(135deg, #f5d77f 0%, #d4af37 50%, #aa820a 100%); color: #000; }
             .gold-border { border-color: #f3ba2f; }
           
-            /* Exact Luxury Curved Gold Wave Background matching Reference */
+            /* Luxury Curved Gold Wave Background */
             .luxury-curved-bg {
                 background:
                     radial-gradient(circle at top right, rgba(243, 186, 47, 0.28) 0%, rgba(212, 160, 23, 0.1) 35%, transparent 65%),
@@ -206,7 +206,7 @@ app.get('/', (req, res) => {
     </head>
     <body class="luxury-curved-bg text-white">
 
-        <!-- Top Header Bar with Phone, Email & Track Order | Help | About Us -->
+        <!-- Top Header Bar -->
         <div class="bg-[#101010] text-xs py-2 px-6 flex justify-between items-center border-b border-zinc-800 relative z-20">
             <div class="flex items-center space-x-6 text-zinc-300">
                 <span><i class="fa-solid fa-phone gold-text mr-1"></i> +94 70 7521 138</span>
@@ -272,7 +272,7 @@ app.get('/', (req, res) => {
             </div>
         </nav>
 
-        <!-- Admin Direct Full-Screen Dashboard -->
+        <!-- Admin Direct Dashboard -->
         <div id="adminDirectDashboard" class="hidden container mx-auto px-6 my-8 text-gray-900">
             <div class="bg-white p-8 rounded-3xl shadow-2xl border border-amber-500">
                 <div class="flex justify-between items-center mb-6 pb-4 border-b">
@@ -333,7 +333,7 @@ app.get('/', (req, res) => {
             </div>
         </div>
 
-        <!-- Hero Section with Luxury Gold Curves matching Reference -->
+        <!-- Hero Section -->
         <div id="heroBanner" class="container mx-auto px-6 mt-8 relative z-10">
             <div class="flex flex-col md:flex-row justify-between items-center py-8">
                 <div class="max-w-xl">
@@ -344,14 +344,12 @@ app.get('/', (req, res) => {
                         Shop Now <i class="fa-solid fa-arrow-right"></i>
                     </button>
                 </div>
-                <!-- Shopping Cart Illustration Box on the right matching Reference -->
                 <div class="mt-8 md:mt-0 flex flex-col items-center">
                     <div class="bg-[#121212]/95 backdrop-blur-md p-8 rounded-3xl border border-amber-500/50 shadow-2xl relative text-center">
                         <div class="absolute -top-3 -right-3 gold-bg text-xs font-black px-3 py-1 rounded-full shadow">EXPRESS CART</div>
                         <i class="fa-solid fa-cart-shopping text-7xl gold-text mb-4"></i>
                         <p class="text-xs font-bold text-zinc-300">Fast Islandwide Checkout</p>
                     </div>
-                    <!-- Trust Badges -->
                     <div class="flex space-x-3 mt-6">
                         <div class="bg-[#121212] px-4 py-2 rounded-full flex items-center gap-2 border border-zinc-800 text-xs shadow">
                             <i class="fa-solid fa-check gold-text"></i> Secure Payment
@@ -425,7 +423,7 @@ app.get('/', (req, res) => {
             </div>
         </main>
 
-        <!-- Footer matching layout -->
+        <!-- Footer -->
         <footer class="bg-[#121212] pt-12 pb-6 border-t border-zinc-800 mt-16 text-sm relative z-10">
             <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                 <div>
@@ -468,7 +466,7 @@ app.get('/', (req, res) => {
             </div>
         </footer>
 
-        <!-- Auth Modal -->
+        <!-- Auth Modal (Login / Register with "Dinidu ravishka") -->
         <div id="authModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex justify-center items-center p-4 text-gray-900">
             <div class="bg-white p-8 rounded-3xl w-full max-w-md shadow-2xl relative border border-amber-500">
                 <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-black font-bold text-2xl">&times;</button>
@@ -477,7 +475,7 @@ app.get('/', (req, res) => {
                 <div id="registerFields" class="hidden space-y-4 mb-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Full Name</label>
-                        <input type="text" id="regName" autocomplete="off" placeholder="Maheshi herath" class="w-full p-3 border rounded-xl outline-none">
+                        <input type="text" id="regName" autocomplete="off" placeholder="Dinidu ravishka" class="w-full p-3 border rounded-xl outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Account Role</label>
@@ -697,6 +695,7 @@ app.get('/', (req, res) => {
             function openAuthModal() {
                 document.getElementById('authEmail').value = '';
                 document.getElementById('authPassword').value = '';
+                if(document.getElementById('regName')) document.getElementById('regName').value = '';
                 document.getElementById('authModal').classList.remove('hidden');
             }
             function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
@@ -708,13 +707,9 @@ app.get('/', (req, res) => {
                 document.getElementById('authSubmitBtn').innerText = isRegisterMode ? 'Register Now' : 'Login';
                 document.getElementById('authToggleText').innerText = isRegisterMode ? 'Already have an account?' : "Don't have an account?";
               
-                if (isRegisterMode) {
-                    document.getElementById('authEmail').placeholder = 'Maheshi@example.com';
-                } else {
-                    document.getElementById('authEmail').placeholder = 'Dinidu ravishka';
-                }
                 document.getElementById('authEmail').value = '';
                 document.getElementById('authPassword').value = '';
+                if(document.getElementById('regName')) document.getElementById('regName').value = '';
             }
 
             async function handleAuthSubmit() {
@@ -723,7 +718,7 @@ app.get('/', (req, res) => {
                 if (!password) { alert('Please enter password!'); return; }
 
                 if (isRegisterMode) {
-                    const name = document.getElementById('regName').value.trim() || 'Maheshi herath';
+                    const name = document.getElementById('regName').value.trim() || document.getElementById('regName').placeholder;
                     const role = document.getElementById('regRole').value;
                     const res = await fetch('/api/register', {
                         method: 'POST',
